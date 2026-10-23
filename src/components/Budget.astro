@@ -1,0 +1,228 @@
+---
+import { allSchedules } from '../lib/schedule.mjs';
+import { compute, defaultState, tnd } from '../lib/budget.mjs';
+import { budget, nights, rental } from '../data/trip.mjs';
+
+const km = allSchedules().reduce((a, s) => a + s.km, 0);
+const state = defaultState(km);
+const r = compute(state);
+const max = Math.max(...r.cats.map((c) => c.value));
+---
+<section class="section budget" id="budget">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">4 people · 1 car · Tunisian dinars</p>
+      <h2>What it costs</h2>
+      <p>Change any setting and the totals update. Fuel uses the real route distance plus 5 % for detours and getting lost.</p>
+    </div>
+
+    <div class="grid">
+      <form class="controls" id="budget-form" onsubmit="return false">
+        <fieldset>
+          <legend>Car</legend>
+          <div class="row two">
+            <div>
+              <label for="b-car">Which car</label>
+              <select id="b-car" name="car">
+                <option value="own" selected>Our own car</option>
+                {rental.cars.map((c) => <option value={c.id}>Rent: {c.name} · {Math.round(Math.min(...c.offers.map((o) => o.total)))} TND</option>)}
+              </select>
+            </div>
+            <div><label for="b-carday">Rental total, 4 days (TND)</label><input id="b-carday" name="carTotal" type="number" step="5" value="0" disabled /></div>
+          </div>
+          <p class="hint">Picking a car fills in its cheapest 4-day price and its fuel type and use. Collect Saturday morning, return Tuesday evening. <a href="#rental">Compare the cars</a></p>
+        </fieldset>
+
+        <fieldset>
+          <legend>Fuel</legend>
+          <div class="row">
+            <label for="b-fuel">Type</label>
+            <select id="b-fuel" name="fuel">
+              <option value="petrol" selected>Petrol, sans plomb ({budget.fuel.pricePetrol} TND/L)</option>
+              <option value="diesel">Diesel, gasoil ({budget.fuel.priceDiesel} TND/L)</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="b-cons">Consumption <output id="b-cons-out" class="mono">{state.consumption} L/100 km</output></label>
+            <input id="b-cons" name="consumption" type="range" min="4.5" max="12" step="0.5" value={state.consumption} />
+          </div>
+          <div class="row two">
+            <div><label for="b-price">Price per litre</label><input id="b-price" name="price" type="number" step="0.005" value={state.price} /></div>
+            <div><label for="b-km">Distance (km)</label><input id="b-km" name="km" type="number" step="1" value={state.km} /></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Hotels</legend>
+          {Object.entries(nights).map(([k, n]) => (
+            <div class="row">
+              <label for={`b-${k}`}>{n.label}</label>
+              <select id={`b-${k}`} name={k} data-night={k}>
+                {n.options.map((o) => <option value={o.id} selected={o.id === state.nights[k]}>{o.name} · ≈{o.pp} TND/pers.</option>)}
+              </select>
+            </div>
+          ))}
+        </fieldset>
+
+        <fieldset>
+          <legend>Food style</legend>
+          <div class="seg" role="radiogroup" aria-label="Food style">
+            {[['budget', 'Sandwich & go'], ['normal', 'Normal'], ['comfort', 'Treat ourselves']].map(([v, l]) => (
+              <label><input type="radio" name="tier" value={v} checked={v === state.tier} /><span>{l}</span></label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Quad in Douz</legend>
+          <div class="row three">
+            <div><label for="b-quads">Quads</label><input id="b-quads" name="quads" type="number" min="0" max="4" value={state.quads} /></div>
+            <div><label for="b-hours">Hours</label><input id="b-hours" name="hours" type="number" min="0.5" max="4" step="0.5" value={state.hours} /></div>
+            <div><label for="b-qprice">TND / quad / h</label><input id="b-qprice" name="quadPrice" type="number" step="5" value={state.quadPrice} /></div>
+          </div>
+          <p class="hint">Two per quad halves the cost. Booking sites ask about 30 € per person per hour, local operators are cheaper: agree on the price with Jamel before you start.</p>
+        </fieldset>
+      </form>
+
+      <div class="result" aria-live="polite">
+        <div class="totals">
+          <div class="pp">
+            <span class="eyebrow">Each of you</span>
+            <b class="mono" id="b-pp">{tnd(r.perPerson)}</b>
+          </div>
+          <div class="all">
+            <span class="eyebrow">Whole group</span>
+            <b class="mono" id="b-total">{tnd(r.total)}</b>
+          </div>
+        </div>
+        <ul class="bars" id="b-bars">
+          {r.cats.map((c) => (
+            <li data-key={c.key}>
+              <span class="lbl">{c.label}</span>
+              <span class="val mono">{tnd(c.value)}</span>
+              <span class="bar"><i style={`width:${((c.value / max) * 100).toFixed(1)}%`}></i></span>
+            </li>
+          ))}
+        </ul>
+        <details class="meals">
+          <summary>What "food" includes, per person</summary>
+          <ul>
+            {budget.meals.map((m) => <li><span>{m.label}</span><span class="mono">{m.pp} TND</span></li>)}
+          </ul>
+          <p class="hint">Dinners and breakfasts are inside the half-board hotel price. "Sandwich & go" is × 0.75, "Treat ourselves" × 1.35.</p>
+        </details>
+        <p class="hint">Not included: wear on your own car, the rental deposit (held on a card, then released), a 4x4 for Mos Espa if you hire one, souvenirs beyond dates and makroudh. The A1 toll is an estimate.</p>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="budget-state" set:html={JSON.stringify(state)} />
+</section>
+
+<script>
+  import { compute, tnd } from '../lib/budget.mjs';
+  import { budget, rental } from '../data/trip.mjs';
+
+  const form = document.getElementById('budget-form') as HTMLFormElement;
+  const state = JSON.parse(document.getElementById('budget-state')!.textContent!);
+  const $ = (id: string) => document.getElementById(id)!;
+
+  const read = () => {
+    const f = new FormData(form);
+    state.km = Number(f.get('km')) || 0;
+    state.consumption = Number(f.get('consumption'));
+    state.price = Number(f.get('price')) || 0;
+    state.tier = f.get('tier');
+    state.quads = Number(f.get('quads')) || 0;
+    state.hours = Number(f.get('hours')) || 0;
+    state.quadPrice = Number(f.get('quadPrice')) || 0;
+    state.car = f.get('car');
+    state.carTotal = state.car === 'own' ? 0 : Number(($('b-carday') as HTMLInputElement).value) || 0;
+    for (const k of Object.keys(state.nights)) state.nights[k] = f.get(k);
+  };
+  const render = () => {
+    read();
+    const r = compute(state);
+    $('b-pp').textContent = tnd(r.perPerson);
+    $('b-total').textContent = tnd(r.total);
+    $('b-cons-out').textContent = `${state.consumption} L/100 km`;
+    const max = Math.max(...r.cats.map((c) => c.value), 1);
+    for (const c of r.cats) {
+      const li = $('b-bars').querySelector<HTMLElement>(`[data-key="${c.key}"]`)!;
+      li.querySelector('.lbl')!.textContent = c.label;
+      li.querySelector('.val')!.textContent = tnd(c.value);
+      li.querySelector<HTMLElement>('.bar i')!.style.width = `${(c.value / max) * 100}%`;
+    }
+  };
+  ($('b-fuel') as HTMLSelectElement).addEventListener('change', (e) => {
+    ($('b-price') as HTMLInputElement).value = String((e.target as HTMLSelectElement).value === 'diesel' ? budget.fuel.priceDiesel : budget.fuel.pricePetrol);
+    render();
+  });
+  // choosing a car sets its daily price, fuel type and consumption
+  const pickCar = (id: string) => {
+    const sel = $('b-car') as HTMLSelectElement;
+    sel.value = id;
+    const car = rental.cars.find((c) => c.id === id);
+    const day = $('b-carday') as HTMLInputElement;
+    day.disabled = !car;
+    day.value = car ? String(Math.round(Math.min(...car.offers.map((o) => o.total)))) : '0';
+    if (car) {
+      ($('b-cons') as HTMLInputElement).value = String(car.consumption);
+      ($('b-fuel') as HTMLSelectElement).value = car.fuel;
+      ($('b-price') as HTMLInputElement).value = String(car.fuel === 'diesel' ? budget.fuel.priceDiesel : budget.fuel.pricePetrol);
+    }
+    render();
+  };
+  ($('b-car') as HTMLSelectElement).addEventListener('change', (e) => pickCar((e.target as HTMLSelectElement).value));
+  // "Use this car in the budget" buttons in the rental section
+  document.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-use-car]');
+    if (!b) return;
+    pickCar(b.dataset.useCar!);
+    document.getElementById('budget')?.scrollIntoView({ behavior: 'smooth' });
+  });
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+</script>
+
+<style>
+  .budget { background: var(--surface-2); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 40px); align-items: start; }
+  .controls { display: grid; gap: 14px; }
+  fieldset { margin: 0; border: 1px solid var(--line); border-radius: var(--radius-inner); padding: 16px 18px 18px; background: var(--surface); display: grid; gap: 12px; min-width: 0; }
+  legend { font: 700 0.95rem var(--f-display); padding: 0 6px; }
+  .row { display: grid; gap: 6px; min-width: 0; }
+  .row.two { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .row > div { display: grid; gap: 6px; min-width: 0; }
+  label { font-size: 0.85rem; font-weight: 600; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  output { color: var(--ink); }
+  select, input[type='number'] {
+    width: 100%; min-width: 0; font: 500 0.95rem var(--f-body); color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px;
+  }
+  input[type='range'] { width: 100%; accent-color: var(--pink); }
+  .seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .seg label { display: block; cursor: pointer; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg span { display: block; text-align: center; padding: 9px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-size: 0.85rem; }
+  .seg input:checked + span { background: var(--pink); color: var(--on-accent); border-color: var(--pink); }
+  .seg input:focus-visible + span { outline: 3px solid var(--pink); outline-offset: 2px; }
+  .hint { font-size: 0.82rem; color: var(--muted); }
+
+  .result { position: sticky; top: 80px; display: grid; gap: 16px; padding: clamp(18px, 3vw, 28px); border-radius: var(--radius); background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); }
+  .totals { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: end; }
+  .totals .eyebrow { color: var(--muted); display: block; }
+  .pp b { font: 800 clamp(2.4rem, 1.6rem + 3vw, 3.8rem) / 1 var(--f-display); font-stretch: 116%; letter-spacing: -0.03em; color: var(--pink); }
+  .all b { font-size: var(--step-1); }
+  .all { text-align: right; }
+  .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .bars li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 0.9rem; }
+  .bar { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 4px; background: var(--pink); transition: width 0.35s ease; }
+  .result .hint { color: var(--muted); }
+  .meals summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+  .meals ul { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 4px; font-size: 0.85rem; }
+  .meals li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 3px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } .result { position: static; order: -1; } }
+  @media (max-width: 420px) { .row.three, .row.two { grid-template-columns: minmax(0, 1fr); } }
+</style>

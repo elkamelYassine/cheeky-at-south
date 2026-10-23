@@ -1,0 +1,65 @@
+---
+import photos from '../data/photos.json';
+import CheekyLogo from './CheekyLogo.astro';
+
+const notes = [
+  { t: 'Fuel', d: 'Fill up in Sousse, top up at Agareb or Gabès, then to the top in Ghomrassen (day 2): it is the last proper town before 265 km of desert road. After that, Douz, Kebili, Tozeur and Gafsa all have stations. Petrol is about 2.525 TND/L, diesel about 2.205 TND/L.' },
+  { t: 'Papers', d: 'Police checkpoints are frequent in the south. Keep everyone\'s ID card and the car papers (carte grise, insurance) within reach, not in the boot.' },
+  { t: 'Cash', d: 'ATMs in Gabès, Tataouine, Douz, Tozeur and Gafsa. None in Ksar Ghilane, Matmata village or the mountain oases. Carry enough cash for lunch, tips and the quad.' },
+  { t: 'Weather', d: 'Early November: 22–26 °C in the day, 8–12 °C at night and at dawn in the desert. A warm layer for the quad and the evenings, sunglasses, sunscreen, a scarf for the dust.' },
+  { t: 'Desert roads', d: 'Watch for sand drifts and camels on the Ksar Ghilane roads, and never drive onto the Chott crust. Avoid the mountain roads after dark. Midès is on the Algerian border: stay on the marked path.' },
+  { t: 'Phone signal', d: 'Patchy between Chenini and Ksar Ghilane, and in the canyons. Download the offline map of southern Tunisia in Google Maps or Maps.me before leaving.' },
+];
+const credits = Object.entries(photos).flatMap(([k, list]) => list.map((p) => ({ k, ...p })));
+---
+<section class="section notes" id="notes">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Practical</p>
+      <h2>Road notes</h2>
+    </div>
+    <dl class="grid">
+      {notes.map((n) => (
+        <div class="reveal"><dt>{n.t}</dt><dd>{n.d}</dd></div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="brand"><CheekyLogo class="foot-logo" /><span>at South</span></p>
+    <p class="made eyebrow">A cheeky labs trip · 7–10 November 2026</p>
+    <p class="small">
+      Drive times are Google Maps figures for each leg (checked 23 October 2026), rounded to 5 minutes. Road lines are drawn with the OSRM routing engine on OpenStreetMap data. Sunrise and sunset computed for each day's location.
+      Prices and phone numbers come from public listings in October 2026: confirm everything by phone before you leave.
+    </p>
+    <details>
+      <summary>Photo credits ({credits.length} photos from Wikimedia Commons)</summary>
+      <ul class="credits">
+        {credits.map((c) => (
+          <li><a href={c.page} target="_blank" rel="noopener">{c.page.split('File:')[1]?.replace(/_/g, ' ').slice(0, 70)}</a> · {c.credit} · {c.license}</li>
+        ))}
+      </ul>
+      <p class="small">Videos are embedded from YouTube and belong to their creators.</p>
+    </details>
+  </div>
+</footer>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 0; }
+  .grid div { padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); }
+  dt { font: 700 var(--step-1) var(--f-display); margin-bottom: 6px; }
+  dd { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .foot { background: #0a0a0b; color: #f4f4f2; border-top: 1px solid #27272a; padding-block: 64px calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .foot .brand { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 18px; }
+  .foot :global(.foot-logo) { width: min(100%, 22rem); }
+  .foot .brand span { font: 800 clamp(1.8rem, 1rem + 3vw, 3.2rem) / 0.9 var(--f-display); font-stretch: 116%; text-transform: uppercase; letter-spacing: -0.025em; color: #ff6a00; }
+  .made { margin-top: 16px; color: #8d8d92; }
+  .small { font-size: 0.85rem; color: #8d8d92; max-width: 80ch; margin-top: 12px; }
+  details { margin-top: 20px; }
+  summary { cursor: pointer; font-weight: 600; }
+  .credits { columns: 2 320px; font-size: 0.75rem; color: #8d8d92; padding-left: 18px; margin-top: 12px; }
+  .credits li { break-inside: avoid; margin-bottom: 4px; overflow-wrap: anywhere; }
+  .credits a { color: #f4f4f2; }
+</style>

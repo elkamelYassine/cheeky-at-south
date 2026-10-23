@@ -1,0 +1,229 @@
+---
+// A small map that follows the reader through the day-by-day timeline.
+// Desktop: sticky column next to the days. Phone: a pull-up sheet with a "where am I" bar.
+// It reads the same JSON as the big map (#map-data).
+---
+<aside class="companion" id="companion" aria-label="Where you are on the route">
+  <div class="cmp-inner">
+    <button class="cmp-bar" id="cmp-bar" type="button" aria-expanded="false" aria-controls="cmp-body">
+      <span class="cmp-dot" aria-hidden="true"></span>
+      <span class="cmp-text">
+        <span class="eyebrow" id="cmp-day">Day 1 · Sat 7 Nov</span>
+        <b id="cmp-now">Sousse</b>
+      </span>
+      <span class="cmp-toggle" aria-hidden="true">Map</span>
+    </button>
+    <div class="cmp-body" id="cmp-body">
+      <div class="cmp-head">
+        <span class="eyebrow" id="cmp-day-2">Day 1 · Sat 7 Nov</span>
+        <b id="cmp-now-2">Sousse</b>
+        <span class="cmp-meta" id="cmp-meta"></span>
+      </div>
+      <div id="cmp-map"></div>
+      <ol class="cmp-steps" id="cmp-steps"></ol>
+    </div>
+  </div>
+</aside>
+
+<script>
+  import L from 'leaflet';
+
+  const data = JSON.parse(document.getElementById('map-data')!.textContent!);
+  const root = document.getElementById('companion')!;
+  const css = (v: string) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const color = (day: string) => css('--' + day);
+  const $ = (id: string) => document.getElementById(id)!;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const map = L.map('cmp-map', { zoomSnap: 0.25, zoomControl: false, attributionControl: false, scrollWheelZoom: false });
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  map.fitBounds(L.latLngBounds(data.lines[0].line), { padding: [20, 20] });
+  const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
+  L.control.attribution({ prefix: false, position: 'bottomleft' }).addAttribution('Esri, OSM').addTo(map);
+  // dark is the default look; only data-theme="light" switches to the paper theme
+  const isDark = () => document.documentElement.dataset.theme !== 'light';
+  const night = () => map.getContainer().classList.toggle('night', isDark());
+  night();
+  window.addEventListener('themechange', () => { night(); paintDay(); });
+  void tiles;
+
+  // per day: stops in order, their markers, and the route split into legs
+  type Stop = any;
+  const days = data.lines.map((l: any) => {
+    const stops: Stop[] = data.points.filter((p: any) => p.day === l.day);
+    // find where each stop sits on the line (walk forward so loops don't confuse it)
+    const idx: number[] = [];
+    let from = 0;
+    for (const s of stops) {
+      let best = from, bd = Infinity;
+      for (let i = from; i < l.line.length; i++) {
+        const d = (l.line[i][0] - s.lat) ** 2 + (l.line[i][1] - s.lon) ** 2;
+        if (d < bd) { bd = d; best = i; }
+      }
+      idx.push(best); from = best;
+    }
+    const legs = stops.map((_: Stop, i: number) => (i === 0 ? null : l.line.slice(idx[i - 1], idx[i] + 1)));
+    return { ...l, stops, legs };
+  });
+
+  const routeLayer = L.layerGroup().addTo(map);
+  const markerLayer = L.layerGroup().addTo(map);
+  const lines = days.map((d: any) => L.polyline(d.line, { weight: 3, opacity: 0.25, interactive: false }).addTo(routeLayer));
+  const activeLeg = L.polyline([], { weight: 7, opacity: 0.95, className: 'cmp-leg', interactive: false }).addTo(routeLayer);
+
+  let curDay = -1, curStop = -1;
+  let markers: L.Marker[] = [];
+
+  const go = (anchor: string) => {
+    document.getElementById(anchor)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    root.classList.remove('open'); $('cmp-bar').setAttribute('aria-expanded', 'false');
+  };
+
+  function paintDay() {
+    lines.forEach((pl: L.Polyline, i: number) => pl.setStyle({ color: color(days[i].day), opacity: i === curDay ? 0.9 : 0.18, weight: i === curDay ? 4 : 3 }));
+    if (curDay >= 0) activeLeg.setStyle({ color: color(days[curDay].day) });
+  }
+
+  function showDay(di: number) {
+    curDay = di;
+    const d = days[di];
+    markerLayer.clearLayers();
+    markers = d.stops.map((s: Stop, i: number) => {
+      const m = L.marker([s.lat, s.lon], {
+        icon: L.divIcon({ className: '', html: `<span class="cpin ${s.kind}" style="--c:${color(d.day)}">${s.kind === 'drive' || s.dep ? '' : i}</span>`, iconSize: s.kind === 'drive' || s.dep ? [12, 12] : [22, 22] }),
+        title: s.name,
+      });
+      m.bindTooltip(`<b>${s.time}</b> ${s.name}`, { direction: 'top', offset: [0, -10], className: 'cmp-tt' });
+      m.on('click', () => go(s.anchor));
+      return m.addTo(markerLayer);
+    });
+    paintDay();
+    $('cmp-steps').innerHTML = d.stops
+      .map((s: Stop, i: number) => `<li data-i="${i}" class="${s.kind}"><button type="button" data-anchor="${s.anchor}"><span class="mono">${s.time}</span><span>${s.dep ? 'Leave · ' : ''}${s.name}</span></button></li>`)
+      .join('');
+    const label = `Day ${d.n} · ${d.short}`;
+    $('cmp-day').textContent = label;
+    $('cmp-day-2').textContent = `${label} · ${d.title}`;
+  }
+
+  const dur = (m: number) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`);
+
+  function showStop(si: number) {
+    curStop = si;
+    const d = days[curDay];
+    const s = d.stops[si];
+    const next = d.stops[si + 1];
+    const prev = d.stops[si - 1];
+    markers.forEach((m, i) => m.getElement()?.firstElementChild?.classList.toggle('on', i === si));
+    activeLeg.setLatLngs(d.legs[si] || []);
+    $('cmp-steps').querySelectorAll('li').forEach((li) => li.classList.toggle('on', Number((li as HTMLElement).dataset.i) === si));
+    $('cmp-steps').querySelector('li.on')?.scrollIntoView({ block: 'nearest' });
+
+    $('cmp-now').textContent = `${s.time} · ${s.name}`;
+    $('cmp-now-2').textContent = s.name;
+    const parts = [`${s.time}${s.stay ? '–' + s.leave : ''}`];
+    if (prev && s.legMin) parts.push(`${Math.round(s.legKm)} km from ${prev.name}`);
+    parts.push(next ? `Next: ${next.name} (${Math.round(next.legKm)} km, ${dur(next.legMin)})` : 'End of the day');
+    $('cmp-meta').textContent = parts.join(' · ');
+
+    // frame the leg you just drove (or the next one, on a departure row)
+    const pts: [number, number][] = [[s.lat, s.lon]];
+    if (prev) pts.push([prev.lat, prev.lon]);
+    else if (next) pts.push([next.lat, next.lon]);
+    const b = L.latLngBounds(pts);
+    if (d.legs[si]) d.legs[si].forEach((p: [number, number]) => b.extend(p));
+    if (root.offsetParent !== null || root.classList.contains('open'))
+      map.flyToBounds(b, { padding: [44, 44], maxZoom: 12, duration: reduce ? 0 : 0.9 });
+  }
+
+  // scroll spy: the stop whose card crosses 40 % of the viewport is "now"
+  const stopEls = days.map((d: any) => d.stops.map((s: Stop) => document.getElementById(s.anchor)));
+  const dayEls = days.map((d: any) => document.getElementById(d.day));
+  let ticking = false;
+  function spy() {
+    ticking = false;
+    const line = innerHeight * 0.4;
+    let di = 0;
+    dayEls.forEach((el: HTMLElement, i: number) => { if (el && el.getBoundingClientRect().top < line) di = i; });
+    let si = 0;
+    stopEls[di].forEach((el: HTMLElement, i: number) => { if (el && el.getBoundingClientRect().top < line) si = i; });
+    if (di !== curDay) { showDay(di); curStop = -1; }
+    if (si !== curStop) showStop(si);
+    const first = dayEls[0].getBoundingClientRect().top;
+    const last = dayEls[dayEls.length - 1].getBoundingClientRect().bottom;
+    root.classList.toggle('in-range', first < innerHeight * 0.6 && last > innerHeight * 0.4);
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+  addEventListener('resize', () => { map.invalidateSize(); spy(); });
+  // the panel settles its height after fonts and images load: re-measure and re-frame
+  new ResizeObserver(() => { map.invalidateSize(); if (curStop >= 0) showStop(curStop); }).observe(map.getContainer());
+  spy();
+
+  $('cmp-steps').addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-anchor]');
+    if (b) go(b.dataset.anchor!);
+  });
+
+  // phone: open/close the sheet
+  $('cmp-bar').addEventListener('click', () => {
+    const open = root.classList.toggle('open');
+    $('cmp-bar').setAttribute('aria-expanded', String(open));
+    if (open) setTimeout(() => { map.invalidateSize(); if (curStop >= 0) showStop(curStop); }, 260);
+  });
+</script>
+
+<style>
+  .companion { min-width: 0; }
+  .cmp-inner { position: sticky; top: calc(66px + env(safe-area-inset-top, 0px)); height: calc(100vh - 82px); display: grid; }
+  .cmp-bar { display: none; }
+  .cmp-body {
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0;
+    border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: var(--shadow);
+  }
+  .cmp-head { display: grid; gap: 2px; padding: 14px 16px 12px; border-bottom: 1px solid var(--line); }
+  .cmp-head b { font: 700 var(--step-1) var(--f-display); letter-spacing: -0.01em; }
+  .cmp-meta { font-size: 0.82rem; color: var(--muted); }
+  #cmp-map { min-height: 220px; background: var(--surface-2); }
+  .cmp-steps { list-style: none; margin: 0; padding: 6px; max-height: 34vh; overflow-y: auto; border-top: 1px solid var(--line); }
+  .cmp-steps :global(button) {
+    width: 100%; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; text-align: left; align-items: baseline;
+    padding: 5px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: 500 0.86rem var(--f-body); cursor: pointer;
+  }
+  .cmp-steps :global(button:hover) { background: var(--surface-2); color: var(--ink); }
+  .cmp-steps :global(li.drive button) { font-size: 0.78rem; opacity: 0.8; }
+  .cmp-steps :global(li.on button) { background: var(--pink); color: var(--on-accent); font-weight: 600; }
+
+  :global(.cpin) {
+    display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--c); color: #fff;
+    font: 700 10px/1 var(--f-mono); border: 2px solid #fff; box-shadow: 0 1px 4px rgb(0 0 0 / 0.35); transition: transform 0.2s;
+  }
+  :global(.cpin.on) { transform: scale(1.45); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 35%, transparent), 0 2px 8px rgb(0 0 0 / 0.4); z-index: 10; animation: cpulse 1.8s ease-out infinite; }
+  @keyframes cpulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 60%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  :global(.cmp-leg) { filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.35)); }
+  :global(.leaflet-tooltip.cmp-tt) { font: 500 0.8rem var(--f-body); background: var(--ink); color: var(--bg); border: 0; }
+  :global(.leaflet-tooltip.cmp-tt::before) { display: none; }
+  :global(#cmp-map.night .leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.7); }
+
+  /* phone & tablet: a bar fixed to the bottom that opens into a sheet */
+  @media (max-width: 1099px) {
+    .companion {
+      position: fixed; z-index: 900; left: 0; right: 0; bottom: 0;
+      padding: 0 max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+      transform: translateY(130%); transition: transform 0.3s ease; pointer-events: none;
+    }
+    .companion:global(.in-range) { transform: none; pointer-events: auto; }
+    .cmp-inner { position: static; height: auto; gap: 8px; }
+    .cmp-bar {
+      display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; border-radius: 16px; border: 1px solid var(--line);
+      background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line), 0 12px 32px rgb(0 0 0 / 0.4); order: 2;
+    }
+    .cmp-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--pink); flex: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--pink) 30%, transparent); }
+    .cmp-text { display: grid; min-width: 0; flex: 1; }
+    .cmp-text .eyebrow { color: var(--pink); font-size: 0.68rem; }
+    .cmp-text b { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cmp-toggle { font: 500 0.6875rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.16em; padding: 6px 12px; border-radius: 999px; background: var(--pink); color: var(--on-accent); }
+    .cmp-body { display: none; height: min(62vh, 560px); }
+    .companion:global(.open) .cmp-body { display: grid; }
+    .cmp-steps { max-height: 22vh; }
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import TripMap from '../components/TripMap.astro';
+import DayPlan from '../components/DayPlan.astro';
+import Hotels from '../components/Hotels.astro';
+import Budget from '../components/Budget.astro';
+import Calls from '../components/Calls.astro';
+import RoadNotes from '../components/RoadNotes.astro';
+import Companion from '../components/Companion.astro';
+import CarRental from '../components/CarRental.astro';
+import { days } from '../data/trip.mjs';
+---
+<Base title="Cheeky at South" description="Four days, four friends, one car: Sousse, Matmata, the ksour, Ksar Ghilane, Douz, Tozeur and the mountain oases. 7–10 November 2026.">
+  <main>
+    <Hero />
+    <TripMap />
+    <div class="wrap journey">
+      <div class="days">
+        {days.map((d) => <DayPlan day={d} />)}
+      </div>
+      <Companion />
+    </div>
+    <Hotels />
+    <CarRental />
+    <Budget />
+    <Calls />
+    <RoadNotes />
+  </main>
+</Base>
+
+<style>
+  .journey { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 420px); gap: clamp(20px, 3vw, 40px); align-items: stretch; }
+  .days { min-width: 0; }
+  @media (max-width: 1099px) { .journey { grid-template-columns: minmax(0, 1fr); } }
+</style>

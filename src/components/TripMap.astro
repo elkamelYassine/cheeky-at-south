@@ -1,0 +1,252 @@
+---
+import { allSchedules, dur } from '../lib/schedule.mjs';
+import { stops, nights, days } from '../data/trip.mjs';
+import photos from '../data/photos.json';
+import routes from '../data/routes.json';
+
+const sch = allSchedules();
+const thumb = (key) => (key && photos[key]?.[0]?.thumb) || null;
+
+const points = sch.flatMap((s) =>
+  s.items.map((it, i) => ({
+    day: s.day.id, n: i + 1, id: it.id, anchor: `${s.day.id}-${it.id}`,
+    name: it.stop.name, ar: it.stop.ar, lat: it.stop.lat, lon: it.stop.lon, kind: it.stop.kind,
+    time: it.arrive, leave: it.leave, stay: it.stay, legKm: it.leg?.km ?? 0, legMin: it.leg?.min ?? 0, dep: i === 0 && s.day.n > 1, summary: it.stop.summary, thumb: thumb(it.stop.photos),
+  })),
+);
+// extra places off the main route (day 3 afternoon option, Ksar Ouled Soltane)
+const extras = days.flatMap((d) => (d.extras || []).map((id) => ({
+  day: d.id, id, anchor: `${d.id}-${id}`, name: stops[id].name, ar: stops[id].ar, lat: stops[id].lat, lon: stops[id].lon,
+  summary: stops[id].summary, thumb: thumb(stops[id].photos), detour: stops[id].detour, extra: true,
+})));
+extras.push({ day: 'd2', id: 'ouled-soltane', anchor: 'n1-alt', name: stops['ouled-soltane'].name, ar: stops['ouled-soltane'].ar, lat: stops['ouled-soltane'].lat, lon: stops['ouled-soltane'].lon, summary: stops['ouled-soltane'].summary, thumb: thumb('ouled-soltane'), detour: stops['ouled-soltane'].detour, extra: true });
+
+const hotels = Object.entries(nights).flatMap(([k, n]) => n.options.map((o) => ({
+  night: k, id: o.id, anchor: `hotel-${o.id}`, name: o.name, type: o.type, lat: o.lat, lon: o.lon, pp: o.pp, pick: !!o.pick, label: n.label,
+})));
+
+const lines = sch.map((s) => ({ day: s.day.id, n: s.day.n, short: s.day.short, title: s.day.title, line: s.line, km: s.km, drive: dur(s.driving) }));
+const data = { points, extras, hotels, lines, swap: routes['d3-swap'].line };
+---
+<section class="section map-section" id="map">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">The whole loop</p>
+      <h2>Every road, every stop</h2>
+      <p>Hover a pin to preview it, click it to jump to its details. The lines follow the real roads. Drive times are Google Maps figures for each leg.</p>
+    </div>
+    <div class="map-tools" role="toolbar" aria-label="Map filters">
+      <button class="btn" type="button" data-filter="all" aria-pressed="true">Full trip</button>
+      {sch.map((s) => (
+        <button class="btn day-btn" type="button" data-filter={s.day.id} aria-pressed="false" style={`--c:${s.day.color}`}>
+          <i></i>Day {s.day.n} <span class="mono">{Math.round(s.km)} km</span>
+        </button>
+      ))}
+      <span class="spacer"></span>
+      <label class="tog"><input type="checkbox" id="show-sug" checked /> Options</label>
+      <label class="tog"><input type="checkbox" id="show-hotels" checked /> Hotels</label>
+      <label class="tog"><input type="checkbox" id="show-sat" /> Satellite</label>
+    </div>
+    <div class="map-frame">
+      <div id="leaflet" aria-label="Interactive map of the trip"></div>
+    </div>
+    <p class="legend">
+      <span><b class="dot"></b>Planned stop</span>
+      <span><b class="dot opt">+</b>Optional detour</span>
+      <span><b class="dot hotel"></b>Hotel option</span>
+      <span><b class="dash"></b>Mos Espa option (day 3)</span>
+    </p>
+  </div>
+  <script type="application/json" id="map-data" set:html={JSON.stringify(data)} />
+</section>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  const data = JSON.parse(document.getElementById('map-data')!.textContent!);
+  const css = (v: string) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const color = (day: string) => css('--' + day);
+
+  const map = L.map('leaflet', { zoomSnap: 0.25, zoomDelta: 0.5, zoomControl: true, scrollWheelZoom: false, attributionControl: true });
+  const bounds = L.latLngBounds(data.lines.flatMap((l: any) => l.line));
+  map.fitBounds(bounds, { padding: [24, 24] });
+  const esri = (svc: string, attribution: string) =>
+    L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, attribution });
+  const light = esri('World_Topo_Map', 'Tiles © Esri, HERE, Garmin, OpenStreetMap contributors');
+  const dark = light;
+  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 18, attribution: 'Imagery © Esri, Maxar, Earthstar Geographics',
+  });
+  // dark is the default look; only data-theme="light" switches to the paper theme
+  const isDark = () => document.documentElement.dataset.theme !== 'light';
+  let base: L.TileLayer = isDark() ? dark : light;
+  base.addTo(map);
+  map.getContainer().classList.toggle('night', isDark());
+  const setBase = () => {
+    const want = (document.getElementById('show-sat') as HTMLInputElement).checked ? sat : isDark() ? dark : light;
+    if (want !== base) { map.removeLayer(base); base = want.addTo(map); }
+    map.getContainer().classList.toggle('night', want !== sat && isDark());
+  };
+  document.getElementById('show-sat')!.addEventListener('change', setBase);
+  window.addEventListener('themechange', () => { setBase(); restyle(); });
+
+  // enable wheel zoom only after the user clicks into the map
+  map.on('click', () => map.scrollWheelZoom.enable());
+  map.getContainer().addEventListener('mouseleave', () => map.scrollWheelZoom.disable());
+
+  const card = (p: any, extra = '') => `
+    <div class="tt">
+      ${p.thumb ? `<img src="${p.thumb}" alt="" loading="lazy">` : ''}
+      <div class="tt-body">
+        <div class="tt-top">${p.time ? `<span class="mono">${p.time}</span>` : ''}</div>
+        <strong>${p.name}</strong> <span class="ar" lang="ar">${p.ar ?? ''}</span>
+        <p>${p.summary ?? ''}</p>
+        ${extra}
+        <em>Click for details</em>
+      </div>
+    </div>`;
+
+  const go = (anchor: string) => {
+    const el = document.getElementById(anchor);
+    if (!el) return;
+    el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  };
+
+  type Group = { day: string; line: L.Polyline; halo: L.Polyline; markers: L.Marker[] };
+  const groups: Group[] = [];
+  const sugLayer = L.layerGroup().addTo(map);
+  const hotelLayer = L.layerGroup().addTo(map);
+
+  for (const l of data.lines) {
+    const halo = L.polyline(l.line, { color: '#000', weight: 8, opacity: 0.12, interactive: false }).addTo(map);
+    const line = L.polyline(l.line, { color: color(l.day), weight: 4.5, opacity: 0.95, className: 'route' }).addTo(map);
+    line.bindTooltip(`Day ${l.n} · ${Math.round(l.km)} km · ${l.drive} at the wheel`, { sticky: true, className: 'line-tt' });
+    line.on('click', () => go(l.day));
+    groups.push({ day: l.day, line, halo, markers: [] });
+  }
+
+  const pinIcon = (p: any) => {
+    const big = p.kind === 'night' || p.kind === 'start';
+    return L.divIcon({
+      className: '',
+      html: `<span class="pin ${p.kind}" style="--c:${color(p.day)}">${p.kind === 'drive' ? '' : p.n}</span>`,
+      iconSize: big ? [30, 30] : p.kind === 'drive' ? [12, 12] : [24, 24],
+    });
+  };
+
+  // avoid stacking the same place twice (Sousse start/end, Tozeur hotel day 3/4, Douz hotel)
+  const seen = new Set<string>();
+  for (const p of data.points) {
+    const key = `${p.lat},${p.lon}`;
+    const g = groups.find((g) => g.day === p.day)!;
+    if (seen.has(key) && p.kind !== 'activity') continue;
+    seen.add(key);
+    const m = L.marker([p.lat, p.lon], { icon: pinIcon(p), riseOnHover: true, keyboard: true, title: p.name });
+    m.bindTooltip(card(p), { direction: 'top', offset: [0, -14], className: 'card-tt', opacity: 1 });
+    m.on('click', () => go(p.anchor));
+    m.addTo(map);
+    g.markers.push(m);
+  }
+
+  const swap = L.polyline(data.swap, { color: color('d3'), weight: 3.5, dashArray: '6 8', opacity: 0.9 });
+  swap.bindTooltip('Day 3 afternoon option: Nefta, Mos Espa & Ong Jmel at sunset', { sticky: true, className: 'line-tt' });
+  swap.addTo(sugLayer);
+  for (const p of data.extras) {
+    const m = L.marker([p.lat, p.lon], { icon: L.divIcon({ className: '', html: `<span class="pin extra" style="--c:${color(p.day)}">+</span>`, iconSize: [24, 24] }), title: p.name });
+    m.bindTooltip(card(p, p.detour ? `<p class="mono small">${p.detour}</p>` : ''), { direction: 'top', offset: [0, -14], className: 'card-tt', opacity: 1 });
+    m.on('click', () => go(p.anchor));
+    m.addTo(sugLayer);
+  }
+
+  const bed = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7h2v6h6V8h7a3 3 0 0 1 3 3v6h-2v-2H5v2H3V7Zm5 1a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg>';
+  for (const h of data.hotels) {
+    const m = L.marker([h.lat, h.lon], { icon: L.divIcon({ className: '', html: `<span class="pin hotel ${h.pick ? 'pick' : ''}">${bed}</span>`, iconSize: [24, 24] }), title: h.name });
+    m.bindTooltip(card({ name: h.name, summary: `${h.label} · ${h.type}` }, `<p class="mono small">≈ ${h.pp} TND / person, half board${h.pick ? ' · our pick' : ''}</p>`), { direction: 'top', offset: [0, -14], className: 'card-tt', opacity: 1 });
+    m.on('click', () => go(h.anchor));
+    m.addTo(hotelLayer);
+  }
+
+  // the container can change size after fonts/images load: refit until the user moves the map
+  let touched = false;
+  ['pointerdown', 'wheel', 'touchstart'].forEach((t) => map.getContainer().addEventListener(t, () => (touched = true), { passive: true }));
+  new ResizeObserver(() => { map.invalidateSize(); if (!touched) map.fitBounds(bounds, { padding: [24, 24] }); }).observe(map.getContainer());
+  window.addEventListener('load', () => { map.invalidateSize(); if (!touched) map.fitBounds(bounds, { padding: [24, 24] }); });
+
+  const restyle =() => groups.forEach((g) => g.line.setStyle({ color: color(g.day) }));
+
+  // day filter with a re-drawn route
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const f = b.dataset.filter!;
+      touched = true;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      groups.forEach((g) => {
+        const on = f === 'all' || g.day === f;
+        g.line.setStyle({ opacity: on ? 0.95 : 0.12, weight: on ? 5 : 3 });
+        g.halo.setStyle({ opacity: on ? 0.12 : 0 });
+        g.markers.forEach((m) => m.setOpacity(on ? 1 : 0.25));
+        if (on && f !== 'all') {
+          const el = g.line.getElement() as SVGPathElement | undefined;
+          if (el) { el.setAttribute('pathLength', '1'); el.classList.remove('drawing'); void el.getBoundingClientRect(); el.classList.add('drawing'); }
+        }
+      });
+      const target = f === 'all' ? bounds : groups.find((g) => g.day === f)!.line.getBounds();
+      map.flyToBounds(target, { padding: [30, 30], duration: 0.8 });
+    }),
+  );
+  const toggle = (id: string, layer: L.Layer) =>
+    document.getElementById(id)!.addEventListener('change', (e) => ((e.target as HTMLInputElement).checked ? layer.addTo(map) : map.removeLayer(layer)));
+  toggle('show-sug', sugLayer);
+  toggle('show-hotels', hotelLayer);
+</script>
+
+<style>
+  .map-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .day-btn i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+  .day-btn .mono { font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+  .day-btn[aria-pressed='true'] .mono { color: inherit; opacity: 0.75; }
+  .spacer { flex: 1; }
+  .tog { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+  .tog input { accent-color: var(--accent); width: 16px; height: 16px; }
+  .map-frame { border-radius: 20px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  #leaflet { height: min(76vh, 720px); min-height: 440px; background: var(--surface-2); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; font-size: 0.85rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--d1); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line); }
+  .legend .dot.opt { background: var(--surface); color: var(--ink); border: 2px dashed var(--muted); display: grid; place-items: center; font: 700 10px var(--f-mono); box-shadow: none; }
+  .legend .dot.hotel { background: var(--ink); border-radius: 5px; }
+  .legend .dash { width: 26px; border-top: 3px dashed var(--d3); }
+
+  :global(.pin) {
+    display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
+    background: var(--c); color: #fff; font: 700 11px/1 var(--f-mono); border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.35); transition: transform 0.15s;
+  }
+  :global(.pin:hover) { transform: scale(1.18); }
+  :global(.pin.night), :global(.pin.start) { font-size: 13px; outline: 3px solid color-mix(in srgb, var(--c) 35%, transparent); }
+  :global(.pin.drive) { border-width: 2px; }
+  :global(.pin.extra) { background: #fff; color: var(--c); border: 2px dashed var(--c); }
+  :global(.pin.extra) { font-size: 15px; }
+  :global(.pin.hotel) { background: #1d1b26; color: #fff; border-radius: 7px; }
+  :global(.pin.hotel.pick) { background: var(--pink); }
+  :global(.leaflet-tooltip.card-tt) { padding: 0; border: 0; border-radius: 12px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25); background: var(--surface); color: var(--ink); overflow: hidden; }
+  :global(.leaflet-tooltip.card-tt::before) { border-top-color: var(--surface); }
+  :global(.tt) { width: 260px; font-family: var(--f-body); white-space: normal; }
+  :global(.tt img) { width: 100%; height: 120px; object-fit: cover; }
+  :global(.tt-body) { padding: 10px 12px 12px; display: grid; gap: 3px; font-size: 0.82rem; line-height: 1.4; }
+  :global(.tt-body strong) { font: 700 1rem var(--f-display); }
+  :global(.tt-top) { display: flex; gap: 8px; align-items: center; color: var(--muted); }
+  :global(.tt-body p) { color: var(--muted); }
+  :global(.tt-body .small) { font-size: 0.75rem; color: var(--ink); }
+  :global(.tt-body em) { font-style: normal; font-size: 0.72rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  :global(.leaflet-tooltip.line-tt) { font: 600 0.8rem var(--f-mono); background: var(--ink); color: var(--bg); border: 0; }
+  :global(.leaflet-tooltip.line-tt::before) { display: none; }
+  :global(path.route.drawing) { stroke-dasharray: 1; stroke-dashoffset: 1; animation: route-draw 1.4s ease-in-out forwards; }
+  @keyframes route-draw { to { stroke-dashoffset: 0; } }
+  :global(.leaflet-container) { font-family: var(--f-body); }
+  :global(.leaflet-container.night .leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.7); }
+  @media (max-width: 640px) { .spacer { display: none; } #leaflet { min-height: 420px; } }
+</style>

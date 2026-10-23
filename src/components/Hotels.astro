@@ -1,0 +1,76 @@
+---
+import Phone from './Phone.astro';
+import Media from './Media.astro';
+import { nights, stops } from '../data/trip.mjs';
+---
+<section class="section" id="hotels">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">3 nights · 4 people</p>
+      <h2>Where to sleep</h2>
+      <p>
+        Prices are per person per night, half board (dinner and breakfast), the way Tunisian hotels quote them.
+        They are estimates for early November. Phone directly: the rate for Tunisian residents is usually below what booking sites show.
+        Numbers come from public listings, and the source is noted next to each one.
+      </p>
+    </div>
+
+    {Object.entries(nights).map(([k, n]) => (
+      <div class="night reveal">
+        <h3 class="night-title"><span class="eyebrow">{n.label}</span>{n.area}</h3>
+        <div class="opts">
+          {n.options.map((o) => (
+            <article class:list={['opt', { pick: o.pick }]} id={`hotel-${o.id}`}>
+              {o.pick && <span class="pick-tag">Our pick</span>}
+              <h4>{o.name}</h4>
+              <p class="type">{o.type}</p>
+              <p class="price"><b class="mono">≈ {o.pp}</b> TND <small>/ person · range {o.range[0]}–{o.range[1]}</small></p>
+              <p class="room mono">≈ {o.pp * 4} TND for the four of you</p>
+              {o.phones.length > 0 ? (
+                <ul class="phones">{o.phones.map((p) => <li><Phone num={p.num} source={p.source} /></li>)}</ul>
+              ) : (
+                <p class="nophone">No public number found.</p>
+              )}
+              {o.contact && <p class="contact">Ask for <b>{o.contact}</b></p>}
+              {o.email && <p class="contact"><a href={`mailto:${o.email}`}>{o.email}</a></p>}
+              {o.web && <p class="contact"><a href={o.web} target="_blank" rel="noopener">{o.web.replace('https://', '')}</a></p>}
+              <p class="onote">{o.note}</p>
+              {o.photos && <Media photoKey={o.photos} name={o.name} limit={1} />}
+            </article>
+          ))}
+        </div>
+        {k === 'n1' && (
+          <article class="alt" id="n1-alt">
+            <span class="eyebrow">If you sleep in Tataouine</span>
+            <h4>{stops['ouled-soltane'].name} <span class="ar" lang="ar" dir="rtl">{stops['ouled-soltane'].ar}</span></h4>
+            <p>{stops['ouled-soltane'].body}</p>
+            <Media photoKey="ouled-soltane" name={stops['ouled-soltane'].name} limit={2} />
+          </article>
+        )}
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .night { margin-top: clamp(28px, 4vw, 48px); }
+  .night-title { display: grid; gap: 4px; font-size: var(--step-2); margin-bottom: 16px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .opt { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); min-width: 0; }
+  .opt.pick { border: 2px solid var(--pink); }
+  .pick-tag { position: absolute; top: -11px; left: 16px; padding: 1px 10px; border-radius: 999px; background: var(--pink); color: #fff; font: 600 0.7rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  h4 { font: 700 var(--step-1) var(--f-display); }
+  .type { color: var(--muted); font-size: 0.88rem; }
+  .price { margin-top: 6px; }
+  .price b { font-size: 1.6rem; }
+  .price small, .room { color: var(--muted); font-size: 0.8rem; }
+  .phones { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+  .nophone { color: var(--muted); font-size: 0.88rem; margin-top: 8px; }
+  .contact { font-size: 0.9rem; overflow-wrap: anywhere; }
+  .onote { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+  .opt :global(.media) { margin-top: auto; padding-top: 12px; }
+  .alt { margin-top: 14px; padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); display: grid; gap: 6px; }
+  .alt h4 { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+  .alt .ar { font-size: 0.7em; color: var(--muted); }
+  .alt p { color: var(--muted); max-width: 70ch; }
+</style>

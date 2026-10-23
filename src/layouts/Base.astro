@@ -1,0 +1,144 @@
+---
+import '../styles/global.css';
+import CheekyLogo from '../components/CheekyLogo.astro';
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0a0a0b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&family=Reem+Kufi:wght@500;700&display=swap"
+    />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light') document.documentElement.dataset.theme = 'light';
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <nav class="wrap topnav" aria-label="Sections">
+        <a class="brand" href="#top" aria-label="Cheeky at South, back to top"><CheekyLogo class="brand-logo" /><span>at South</span></a>
+        <div class="links">
+          <a href="#map">Map</a>
+          <a href="#d1">Day 1</a>
+          <a href="#d2">Day 2</a>
+          <a href="#d3">Day 3</a>
+          <a href="#d4">Day 4</a>
+          <a href="#hotels">Hotels</a>
+          <a href="#rental">Car</a>
+          <a href="#budget">Budget</a>
+          <a href="#calls">Calls</a>
+        </div>
+        <button class="theme" id="theme-toggle" type="button" aria-label="Switch light or dark theme">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-9.54-5.54A9 9 0 0 0 12 3Z"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <slot />
+
+    <div class="grain" aria-hidden="true"></div>
+
+    <dialog id="lightbox" class="lightbox" aria-label="Photo">
+      <form method="dialog"><button class="lb-close" aria-label="Close">×</button></form>
+      <figure>
+        <img alt="" />
+        <figcaption></figcaption>
+      </figure>
+    </dialog>
+
+    <script>
+      // theme toggle
+      const root = document.documentElement;
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        // dark is the default look; the toggle only adds or removes the light "paper" theme
+        if (root.dataset.theme === 'light') delete root.dataset.theme; else root.dataset.theme = 'light';
+        try { localStorage.setItem('theme', root.dataset.theme || 'dark'); } catch {}
+        window.dispatchEvent(new CustomEvent('themechange'));
+      });
+
+      // scroll reveal
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))),
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+      // photo lightbox
+      const lb = document.getElementById('lightbox') as HTMLDialogElement;
+      document.addEventListener('click', (ev) => {
+        const t = (ev.target as HTMLElement).closest<HTMLElement>('[data-full]');
+        if (!t) return;
+        lb.querySelector('img')!.src = t.dataset.full!;
+        lb.querySelector('img')!.alt = t.dataset.alt || '';
+        lb.querySelector('figcaption')!.innerHTML = t.dataset.caption || '';
+        lb.showModal();
+      });
+      lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+
+      // YouTube facades: load the player only when asked
+      document.addEventListener('click', (ev) => {
+        const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-yt]');
+        if (!b) return;
+        const f = document.createElement('iframe');
+        f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
+        f.title = b.dataset.title || 'YouTube video';
+        f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        b.replaceWith(f);
+      });
+
+      // copy phone numbers
+      document.addEventListener('click', async (ev) => {
+        const b = (ev.target as HTMLElement).closest<HTMLButtonElement>('[data-copy]');
+        if (!b) return;
+        try { await navigator.clipboard.writeText(b.dataset.copy!); b.dataset.done = '1'; setTimeout(() => delete b.dataset.done, 1400); } catch {}
+      });
+    </script>
+
+    <style>
+      .topbar {
+        position: sticky; top: env(safe-area-inset-top, 0px); z-index: 1000;
+        background: color-mix(in srgb, var(--bg) 72%, transparent);
+        backdrop-filter: blur(20px) saturate(140%);
+        border-bottom: 1px solid var(--line);
+      }
+      .topnav { display: flex; align-items: center; gap: 20px; height: 64px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; white-space: nowrap; transition: opacity 0.3s; }
+      .brand:hover { opacity: 0.8; }
+      .brand :global(.brand-logo) { width: 7.5rem; }
+      .brand span { font: 500 0.6875rem var(--f-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pink); padding-top: 4px; }
+      .links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-left: auto; min-width: 0; }
+      .links a {
+        color: var(--muted); text-decoration: none; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
+        padding: 6px 10px; border-radius: 999px; white-space: nowrap; transition: color 0.3s;
+      }
+      .links a:hover { color: var(--ink); }
+      .theme { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 15%, transparent); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+      .theme:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+      @media (max-width: 720px) { .brand span { display: none; } .brand :global(.brand-logo) { width: 6.25rem; } .topnav { gap: 8px; } }
+
+      .lightbox { border: 0; padding: 0; background: transparent; max-width: min(1200px, 94vw); max-height: 92vh; }
+      .lightbox::backdrop { background: rgb(10 9 14 / 0.86); }
+      .lightbox figure { margin: 0; display: grid; gap: 8px; }
+      .lightbox img { max-height: 82vh; width: auto; margin-inline: auto; border-radius: 10px; }
+      .lightbox figcaption { color: #e8e3da; font-size: 0.82rem; text-align: center; }
+      .lightbox figcaption :global(a) { color: #fff; }
+      .lb-close { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(16px + env(safe-area-inset-right, 0px)); width: 44px; height: 44px; border-radius: 50%; border: 0; font-size: 26px; cursor: pointer; background: #fff; color: #111; }
+    </style>
+  </body>
+</html>

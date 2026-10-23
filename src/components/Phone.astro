@@ -1,0 +1,20 @@
+---
+const { num, source } = Astro.props;
+const tel = num.replace(/\s/g, '');
+---
+<span class="phone">
+  <a class="mono" href={`tel:${tel}`}>{num}</a>
+  <button type="button" class="copy" data-copy={num} aria-label={`Copy ${num}`}>
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 7V3h12v14h-4v4H4V7h4Zm2 0h6v8h2V5h-8v2ZM6 9v10h8V9H6Z"/></svg>
+  </button>
+  {source && <small>{source}</small>}
+</span>
+
+<style>
+  .phone { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  .phone a { font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--accent); }
+  .copy { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+  .copy:hover { color: var(--ink); border-color: var(--ink); }
+  .copy[data-done] { color: var(--accent); border-color: var(--accent); }
+  small { color: var(--muted); font-size: 0.75rem; }
+</style>

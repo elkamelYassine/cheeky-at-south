@@ -1,0 +1,70 @@
+---
+import Phone from './Phone.astro';
+import { nights } from '../data/trip.mjs';
+
+const pick = (k) => nights[k].options.find((o) => o.pick);
+const calls = [
+  { when: 'Now', who: pick('n1').name, why: 'Room for 4, Sat 7 Nov, half board', phone: pick('n1').phones[0], anchor: 'hotel-hadada' },
+  { when: 'Now', who: 'Hotel Mehari Douz (ask for Mokhtar)', why: 'Room for 4, Sun 8 Nov, half board', phone: nights.n2.options[1].phones[0], anchor: 'hotel-mehari' },
+  { when: 'Now', who: pick('n3').name, why: 'Room for 4, Mon 9 Nov, half board', phone: pick('n3').phones[0], anchor: 'hotel-rasain' },
+  { when: 'If renting', who: 'Drivo Tunisie: Toyota RAV4 (or Ford Ranger)', why: 'Hand-over Sat 7 Nov around 07:00 at Monastir airport (or delivered in Sousse), return Tue 10 Nov evening. Free cancellation up to 48 h before', phone: { num: '+216 23 172 991', source: 'Drivo, also WhatsApp' }, anchor: 'rental' },
+  { when: 'Week before', who: 'Jamel / Jmed (quad, Douz)', why: 'Quad Sun 8 Nov at 16:40 for the sunset, pick-up at the hotel. Agree the price per quad', phone: { num: '+216 96 345 597', source: 'your draft' }, anchor: 'd2-douz-dune' },
+  { when: 'Fri 6 Nov', who: 'Massoud, Hotel Sidi Driss', why: 'Lunch for 4 on Sat 7 Nov around 13:30', phone: { num: '+216 75 240 005', source: 'hotel line, ask for Massoud' }, anchor: 'd1-sidi-driss' },
+  { when: 'Sun 8 Nov', who: 'Hotel Mehari Douz', why: 'Say you arrive around 16:20 and go straight out on the quad. Ask them to keep dinner', phone: null, anchor: 'hotel-mehari' },
+  { when: 'Mon 9 Nov', who: 'Bistro 76, Gafsa', why: 'Optional: table for 4 on Tue 10 Nov around 12:40', phone: { num: '+216 28 639 726', source: 'Trip.com, name not confirmed' }, anchor: 'd4-gafsa' },
+];
+---
+<section class="section" id="calls">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Before you leave</p>
+      <h2>Calls to make</h2>
+      <p>Tick them off as you go. The ticks stay saved in this browser.</p>
+    </div>
+    <ol class="calls reveal">
+      {calls.map((c, i) => (
+        <li>
+          <input type="checkbox" id={`call-${i}`} data-store={`call-${i}`} />
+          <label for={`call-${i}`}>
+            <span class="when mono">{c.when}</span>
+            <b>{c.who}</b>
+            <span class="why">{c.why}</span>
+          </label>
+          <div class="act">
+            {c.phone && <Phone num={c.phone.num} source={c.phone.source} />}
+            <a href={`#${c.anchor}`} class="more">Details</a>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLInputElement>('[data-store]').forEach((cb) => {
+    try { cb.checked = localStorage.getItem(cb.dataset.store!) === '1'; } catch {}
+    cb.addEventListener('change', () => { try { localStorage.setItem(cb.dataset.store!, cb.checked ? '1' : '0'); } catch {} });
+  });
+</script>
+
+<style>
+  .calls { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .calls li {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px 16px; align-items: center;
+    padding: 14px 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line);
+  }
+  input { width: 22px; height: 22px; accent-color: var(--accent); }
+  label { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 2px 14px; cursor: pointer; }
+  .when { grid-row: span 2; font-size: 0.8rem; color: var(--pink); font-weight: 600; padding-top: 3px; }
+  .why { color: var(--muted); font-size: 0.92rem; }
+  li:has(input:checked) b, li:has(input:checked) .why { text-decoration: line-through; opacity: 0.55; }
+  .act { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px 14px; }
+  .act :global(small) { display: none; }
+  .more { font-size: 0.85rem; font-weight: 600; }
+  @media (max-width: 760px) {
+    .calls li { grid-template-columns: auto minmax(0, 1fr); }
+    .act { grid-column: 2; justify-content: flex-start; }
+    label { grid-template-columns: minmax(0, 1fr); }
+    .when { grid-row: auto; }
+  }
+</style>

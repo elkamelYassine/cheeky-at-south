@@ -1,0 +1,201 @@
+---
+import Media from './Media.astro';
+import Phone from './Phone.astro';
+import { schedule, dur, legOf } from '../lib/schedule.mjs';
+import { stops, nights } from '../data/trip.mjs';
+import routes from '../data/routes.json';
+
+const { day } = Astro.props;
+const s = schedule(day);
+const kindLabel = { start: 'Start', stop: 'Stop', meal: 'Meal', night: 'Night', drive: 'Drive through', activity: 'Activity' };
+const night = day.night && nights[day.night];
+const pick = night && night.options.find((o) => o.pick);
+const swap = routes['d3-swap'];
+const swapMin = Math.round(swap.legs.reduce((a, l) => a + legOf(l).raw, 0) / 5) * 5;
+---
+<section class="day" id={day.id} style={`--c:${day.color}`}>
+  <header class="day-head reveal">
+    <div class="num" aria-hidden="true">{day.n}</div>
+    <div class="head-main">
+      <p class="eyebrow">Day {day.n} · {day.weekday} {day.short.split(' ').slice(1).join(' ')} 2026</p>
+      <h2>{day.title}</h2>
+      <p class="fromto">{day.from} <span aria-hidden="true">→</span><span class="visually-hidden">to</span> {day.to}</p>
+      <dl class="chips">
+        <div><dt>Leave</dt><dd class="mono">{day.start}</dd></div>
+        <div><dt>Arrive</dt><dd class="mono">{s.end}</dd></div>
+        <div><dt>Distance</dt><dd class="mono">{Math.round(s.km)} km</dd></div>
+        <div><dt>Driving</dt><dd class="mono">{dur(s.driving)}</dd></div>
+        <div><dt>Sunrise</dt><dd class="mono">{day.sunrise}</dd></div>
+        <div><dt>Sunset</dt><dd class="mono">{day.sunset}</dd></div>
+      </dl>
+      {day.note && <p class="note"><b>Good to know:</b> {day.note}</p>}
+    </div>
+  </header>
+
+  <ol class="timeline">
+    {s.items.map((it, idx) => idx === 0 && day.n > 1 ? (
+        <li class="stop k-drive depart" id={`${day.id}-${it.id}`}>
+          <div class="rail"><time class="mono">{it.arrive}</time></div>
+          <article class="card">
+            <div class="kicker"><span class="kind">Leave</span></div>
+            <h3>{it.id === 'sun-palm' ? 'Hotel Mehari Douz' : it.id === 'tozeur-hotel' ? 'Tozeur hotel' : it.stop.name} <span class="ar" lang="ar" dir="rtl">{it.stop.ar}</span></h3>
+            {day.id === 'd3' && <p class="body small">Breakfast at 08:00, leave at 09:00. Fuel up in Douz or Kebili on the way out.</p>}
+            {day.id === 'd2' && <p class="body small">Breakfast from 07:00. Walk the courtyards at sunrise (06:40) before it.</p>}
+            {day.id === 'd4' && <p class="body small">Breakfast at 06:45, bags in the car, leave at 07:30.</p>}
+          </article>
+        </li>
+      ) : (
+      <>
+        {it.leg && it.leg.min > 0 && (
+          <li class="leg">
+            <div class="rail"></div>
+            <div class="road">
+              <span class="borne" aria-label={`${Math.round(it.leg.km)} kilometres`}><b class="mono">{it.leg.km < 10 ? it.leg.km.toFixed(1) : Math.round(it.leg.km)}</b><small>km</small></span>
+              <span class="drive"><b>{dur(it.leg.min)}</b> drive <small class="mono">({it.leg.src}: {it.leg.raw} min)</small></span>
+            </div>
+          </li>
+        )}
+        <li class:list={['stop', `k-${it.stop.kind}`]} id={`${day.id}-${it.id}`}>
+          <div class="rail">
+            <time class="mono">{it.arrive}</time>
+            {it.stay > 0 && <span class="stay">{dur(it.stay)}</span>}
+            {it.afterSunset && <span class="dark" title="After sunset">after dark</span>}
+          </div>
+          <article class="card reveal">
+            <div class="kicker">
+              <span class="kind">{kindLabel[it.stop.kind]}</span>
+              {it.stop.approx && <span class="badge approx">Pin approximate</span>}
+              {it.stay > 0 && <span class="mono until">until {it.leave}</span>}
+            </div>
+            <h3>{it.stop.name} <span class="ar" lang="ar" dir="rtl">{it.stop.ar}</span></h3>
+            <p class="summary">{it.stop.summary}</p>
+            {it.stop.kind !== 'drive' && it.stop.body && <p class="body">{it.stop.body}</p>}
+            {it.stop.kind === 'drive' && it.stop.body && <p class="body small">{it.stop.body}</p>}
+            {it.stop.tips && (
+              <ul class="tips">{it.stop.tips.map((t) => <li>{t}</li>)}</ul>
+            )}
+            {it.stop.contacts && (
+              <ul class="contacts">
+                {it.stop.contacts.map((c) => (
+                  <li><span class="who">{c.label}</span>{c.phone ? <Phone num={c.phone} source={c.source} /> : <small>{c.note}</small>}</li>
+                ))}
+              </ul>
+            )}
+            {it.stop.kind !== 'drive' && <Media photoKey={it.stop.photos} videoIds={it.stop.videos} name={it.stop.name} />}
+            {it.stop.kind === 'drive' && it.stop.photos && <Media photoKey={it.stop.photos} name={it.stop.name} limit={1} />}
+          </article>
+        </li>
+      </>
+    ))}
+  </ol>
+
+  {day.extras && (
+    <div class="swap reveal">
+      <div class="swap-card">
+        <p class="eyebrow">Option for the afternoon, instead of the zoo, Chak Wak and Belvédère · {Math.round(swap.km)} km loop · {dur(swapMin)} driving</p>
+        {day.extras.map((id) => (
+          <article id={`${day.id}-${id}`} class="swap-item">
+            <h3>{stops[id].name} <span class="ar" lang="ar" dir="rtl">{stops[id].ar}</span></h3>
+            <p class="summary">{stops[id].summary}</p>
+            <p class="body">{stops[id].body}</p>
+            {stops[id].tips && <ul class="tips">{stops[id].tips.map((t) => <li>{t}</li>)}</ul>}
+            <Media photoKey={stops[id].photos} videoIds={stops[id].videos} name={stops[id].name} />
+          </article>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {pick && (
+    <div>
+      <a class="sleep reveal" href={`#hotel-${pick.id}`}>
+        <span class="eyebrow">{night.label} · {night.area}</span>
+        <b>Sleep at {pick.name}</b>
+        <span class="muted">≈ {pick.pp} TND per person, half board · {night.options.length - 1} alternatives in Hotels →</span>
+      </a>
+    </div>
+  )}
+</section>
+
+<style>
+  .day { padding-block: clamp(56px, 8vw, 100px) 24px; border-top: 1px solid var(--line); }
+  .day-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(16px, 4vw, 48px); align-items: start; margin-bottom: clamp(28px, 5vw, 56px); }
+  .num {
+    font: 800 clamp(6rem, 4rem + 10vw, 13rem) / 0.78 var(--f-display); color: var(--c); letter-spacing: -0.06em;
+    font-stretch: 116%; position: sticky; top: 84px;
+  }
+  .head-main { display: grid; gap: 10px; min-width: 0; }
+  h2 { font-size: var(--step-3); font-weight: 800; font-stretch: 116%; text-transform: uppercase; letter-spacing: -0.025em; line-height: 0.92; }
+  .fromto { font: 600 var(--step-1) var(--f-display); font-stretch: 104%; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+  .chips div { padding: 6px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: grid; }
+  .chips dt { font: 600 0.66rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .chips dd { margin: 0; font-weight: 600; }
+  .note { max-width: 68ch; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--c) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); font-size: 0.95rem; }
+  .note b { color: var(--c); }
+
+  .timeline { list-style: none; margin: 0 auto; display: grid; }
+  .timeline > li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 0 20px; }
+  .rail { position: relative; display: grid; align-content: start; justify-items: end; gap: 2px; padding-top: 18px; padding-right: 22px; }
+  .rail::before { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 3px; background: color-mix(in srgb, var(--c) 35%, transparent); }
+  .stop .rail::after { content: ''; position: absolute; right: -7px; top: 22px; width: 17px; height: 17px; border-radius: 50%; background: var(--c); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--c); }
+  .stop.k-drive .rail::after { width: 11px; height: 11px; right: -4px; top: 25px; }
+  time { font-size: 1.25rem; font-weight: 600; }
+  .stay { font-size: 0.78rem; color: var(--muted); }
+  .dark { font: 600 0.68rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sug); }
+
+  .card { margin-block: 10px; padding: clamp(16px, 2.4vw, 26px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+  .k-drive .card { background: transparent; border-style: dashed; padding-block: 12px; }
+  .k-night .card { border-color: var(--c); box-shadow: inset 4px 0 0 var(--c); }
+  .kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .kind { font: 600 0.72rem var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--c); }
+  .until { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
+  h3 { font-size: var(--step-2); font-weight: 800; font-stretch: 104%; letter-spacing: -0.035em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .k-drive h3 { font-size: var(--step-1); }
+  h3 .ar { font-size: 0.62em; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+  .summary { font-weight: 600; margin-top: 6px; }
+  .body { color: var(--muted); margin-top: 8px; max-width: 70ch; }
+  .body.small { font-size: 0.92rem; }
+  .tips { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .tips li { padding-left: 22px; position: relative; font-size: 0.93rem; }
+  .tips li::before { content: ''; position: absolute; left: 4px; top: 0.6em; width: 8px; height: 8px; border-radius: 2px; background: var(--c); transform: rotate(45deg); }
+  .contacts { list-style: none; margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); display: grid; gap: 8px; }
+  .contacts li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+  .who { font-weight: 700; min-width: 0; }
+  .contacts small { color: var(--muted); }
+
+  .leg .rail { padding: 0; }
+  .road { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
+  .borne {
+    width: 46px; flex: none; display: grid; justify-items: center; padding: 14px 0 6px; border-radius: 22px 22px 6px 6px;
+    background: linear-gradient(#d7262e 0 34%, #ffffff 34%); border: 1px solid #c9c4ba; color: #1d1b26; line-height: 1;
+  }
+  .borne b { font-size: 0.85rem; margin-top: 4px; }
+  .borne small { font: 600 0.6rem var(--f-mono); color: #555; }
+  .drive { font-size: 0.92rem; color: var(--muted); }
+  .drive b { color: var(--ink); }
+  .drive small { font-size: 0.72rem; opacity: 0.8; }
+
+  .swap { margin-top: 18px; }
+  .swap-card { margin-left: 112px; padding: clamp(16px, 2.4vw, 26px); border: 2px solid var(--c); border-radius: var(--radius); display: grid; gap: 22px; }
+  .swap-item { display: grid; gap: 4px; }
+  .sleep { margin: 20px 0 0 112px; display: grid; gap: 4px; padding: 18px 22px; border-radius: var(--radius); background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); text-decoration: none; transition: transform 0.4s var(--ease-out-expo), box-shadow 0.3s; }
+  .sleep:hover { box-shadow: inset 0 0 0 1px var(--pink); }
+  .sleep:hover { transform: translateY(-2px); }
+  .sleep .eyebrow { color: var(--pink); }
+  .sleep b { font: 700 var(--step-1) var(--f-display); }
+  .sleep .muted { color: var(--muted); font-size: 0.9rem; }
+
+  :global(.flash) > .card, :global(.flash).swap-item { animation: flash 1.6s ease-out; }
+  @keyframes flash { 0%, 30% { box-shadow: 0 0 0 4px var(--pink); } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  @media (max-width: 720px) {
+    .day-head { grid-template-columns: minmax(0, 1fr); }
+    .num { position: static; font-size: 5.5rem; }
+    .timeline > li { grid-template-columns: 64px minmax(0, 1fr); gap: 0 14px; }
+    .rail { padding-right: 14px; }
+    time { font-size: 1rem; }
+    .swap-card, .sleep { margin-left: 0; }
+    .until { margin-left: 0; }
+  }
+</style>

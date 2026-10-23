@@ -1,0 +1,116 @@
+/* Layout concept: a road book in the Cheeky Labs style. Dark page, one orange accent,
+   wide extra-bold capitals for titles, mono labels. A time rail on the left, the road on
+   the right, milestones between stops, one colour per day.
+   Dark is the default (as on cheekylabs); the toggle switches to a light "paper" version. */
+:root {
+  --bg: #0a0a0b;          /* page */
+  --surface: #18181b;     /* card */
+  --surface-2: #111113;   /* elevated / nested */
+  --ink: #f4f4f2;
+  --muted: #8d8d92;
+  --faint: #56565b;
+  --line: #27272a;
+  --accent: #ff8a3d;      /* links, small highlights (orange-soft) */
+  --pink: #ff6a00;        /* the Cheeky orange: emphasis, picks, totals */
+  --on-accent: #0a0a0b;   /* text on orange */
+  --brand-orange: #f95903; /* logo "labs" only */
+  --ochre: #ffb547;
+  --d1: #ffb547;
+  --d2: #ff6a00;
+  --d3: #ff4f8b;
+  --d4: #3cc6a8;
+  --sug: #a99bff;
+  --on-photo: #ffffff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 40px rgb(0 0 0 / 0.35);
+
+  --f-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+  --f-body: 'Geist', 'Segoe UI', system-ui, sans-serif;
+  --f-mono: 'Geist Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --f-ar: 'Reem Kufi', 'Noto Kufi Arabic', 'Segoe UI', sans-serif;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.07rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.3rem + 0.9vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.5rem + 2.6vw, 3.6rem);
+  --step-4: clamp(3rem, 2rem + 6vw, 7.5rem);
+
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --wrap: 1180px;
+  --radius: 1.75rem;      /* containers */
+  --radius-inner: 1.25rem; /* nested surfaces, inputs */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f3f2ee; --surface: #ffffff; --surface-2: #e9e7e1; --ink: #151515; --muted: #6a6964; --faint: #a3a19b; --line: #d9d7d0;
+  --accent: #c84f00; --pink: #e55e00; --on-accent: #ffffff; --ochre: #b97a10;
+  --d1: #b97a10; --d2: #e05a00; --d3: #cf2e6a; --d4: #12856f; --sug: #5b4fc4;
+  --shadow: 0 1px 2px rgb(21 21 21 / 0.06), 0 10px 28px rgb(21 21 21 / 0.08);
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: var(--step-0); line-height: 1.6; letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgb(255 106 0 / 0.4); color: var(--ink); }
+img { max-width: 100%; display: block; }
+a { color: var(--accent); text-underline-offset: 3px; }
+h1, h2, h3, h4 { font-family: var(--f-display); line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+p, li { text-wrap: pretty; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; border-radius: 4px; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.ar { font-family: var(--f-ar); font-weight: 500; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-left: var(--gutter); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Cheeky Labs type utilities */
+.display { font-family: var(--f-display); font-weight: 800; font-stretch: 116%; text-transform: uppercase; letter-spacing: -0.025em; line-height: 0.92; overflow-wrap: break-word; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+
+.section { padding-block: clamp(64px, 9vw, 120px); }
+.section-head { display: grid; gap: 14px; margin-bottom: clamp(28px, 4vw, 48px); max-width: 66ch; }
+.section-head .eyebrow { color: var(--pink); }
+.section-head h2 { font-size: var(--step-3); font-weight: 800; font-stretch: 116%; text-transform: uppercase; letter-spacing: -0.025em; line-height: 0.92; }
+.section-head p { color: var(--muted); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px;
+  font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid currentColor; line-height: 1.6; white-space: nowrap;
+}
+.badge.approx { color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px;
+  font: 500 0.8125rem var(--f-body); border: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent);
+  background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink);
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background-color 0.5s var(--ease-spring), color 0.3s, scale 0.3s var(--ease-spring);
+}
+.btn:hover { background: color-mix(in srgb, var(--ink) 11%, transparent); }
+.btn:active { scale: 0.97; }
+.btn[aria-pressed='true'] { background: var(--pink); color: var(--on-accent); box-shadow: none; }
+
+/* film grain, as on cheekylabs */
+.grain {
+  position: fixed; inset: 0; z-index: 1500; pointer-events: none; opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme='light'] .grain { opacity: 0.035; }
+
+/* scroll reveal: only when JS runs, and never fully invisible */
+.js .reveal { transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo); }
+.js .reveal:not(.in) { opacity: 0.2; transform: translateY(28px); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal:not(.in) { opacity: 1; transform: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

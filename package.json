@@ -1,0 +1,20 @@
+{
+  "name": "cheeky-at-south",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "routes": "node scripts/route.mjs",
+    "videos": "node scripts/videos.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.2",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

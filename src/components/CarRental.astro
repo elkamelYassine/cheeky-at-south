@@ -1,0 +1,146 @@
+---
+import Phone from './Phone.astro';
+import { rental, budget } from '../data/trip.mjs';
+import { allSchedules } from '../lib/schedule.mjs';
+import photos from '../data/photos.json';
+
+const km = allSchedules().reduce((a, s) => a + s.km, 0) * (1 + budget.fuel.bufferPct / 100);
+const fuelCost = (c) => (km * c.consumption) / 100 * (c.fuel === 'diesel' ? budget.fuel.priceDiesel : budget.fuel.pricePetrol);
+const fmt = (v) => Math.round(v).toLocaleString('en-US');
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const best = (c) => Math.min(...c.offers.map((o) => o.total));
+// your picks first, then by price
+const rank = (c) => (c.pick ? 0 : c.pick2 ? 1 : 2);
+const groups = rental.groups.map((g) => [g.title, rental.cars.filter((c) => c.group === g.id).sort((a, b) => rank(a) - rank(b) || best(a) - best(b))]);
+---
+<section class="section rental" id="rental">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Option · collect Sat 7 Nov early morning, return Tue 10 Nov evening</p>
+      <h2>Rent a car instead</h2>
+      <p>
+        The exact model and the real price for 4 days, picked up at Monastir airport, 20 minutes from Sousse. Local agencies
+        (Drivo, 3A) beat the airport desks by far. Totals include insurance and unlimited km. "All in" adds the fuel for the full loop.
+      </p>
+      <p class="hours"><b>Hand-over:</b> {rental.hours}</p>
+    </div>
+
+    {groups.map(([title, list]) => (
+      <>
+        <h3 class="group reveal">{title}</h3>
+        <div class="cars">
+          {list.map((c) => {
+            const p = photos[c.photos]?.[0];
+            const total = best(c);
+            const allIn = total + fuelCost(c);
+            const offers = [...c.offers].sort((a, b) => a.total - b.total);
+            return (
+              <article class:list={['car reveal', { pick: c.pick || c.pick2 }]} id={`car-${c.id}`}>
+                {c.pick && <span class="pick-tag">Your pick</span>}
+                {c.pick2 && <span class="pick-tag alt">Your other pick</span>}
+                {p && (
+                  <button type="button" class="car-ph" data-full={p.src} data-alt={c.name} data-caption={`${esc(c.name)} (the rental may be a similar model) · Photo: ${esc(p.credit)} · ${esc(p.license)} · <a href="${p.page}" target="_blank" rel="noopener">Wikimedia Commons</a>`}>
+                    <img src={p.thumb} alt={c.name} loading="lazy" width="640" height={Math.round((640 * p.h) / p.w)} />
+                  </button>
+                )}
+                <div class="car-body">
+                  <p class="eyebrow">{c.cls}</p>
+                  <h4>{c.name} <small>or similar</small></h4>
+                  <ul class="offers">
+                    {offers.map((o, i) => (
+                      <li class:list={{ low: i === 0 }}><span>{o.by}</span><b class="mono">{fmt(o.total)} TND</b></li>
+                    ))}
+                  </ul>
+                  <dl class="specs">
+                    <div><dt>All in, 4 days</dt><dd class="mono">≈ {fmt(allIn)} TND</dd></div>
+                    <div><dt>Each</dt><dd class="mono">≈ {fmt(allIn / 4)} TND</dd></div>
+                    <div><dt>Boot</dt><dd>{c.trunk}</dd></div>
+                    <div><dt>Gearbox · seats</dt><dd>{c.gearbox} · {c.seats}</dd></div>
+                  </dl>
+                  <p class="verdict">{c.verdict}</p>
+                  <ul class="pros">{c.good.map((g) => <li>{g}</li>)}</ul>
+                  <ul class="cons">{c.bad.map((g) => <li>{g}</li>)}</ul>
+                  <button type="button" class="btn use" data-use-car={c.id}>Use in the budget</button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </>
+    ))}
+
+    <p class="fourbyfour reveal">
+      <b>Do you need a 4x4?</b> No: every road in the plan is paved. The only sandy bit is the track to Mos Espa, which the Ranger
+      handles easily and the RAV4 manages with care in dry weather. For comparison, a Suzuki Jimny at the airport desks costs about 3,800 TND for these 4 days.
+    </p>
+
+    <h3 class="ag-title reveal">Where to rent</h3>
+    <div class="agencies">
+      {rental.agencies.map((a) => (
+        <article class="ag reveal">
+          <h4>{a.name}</h4>
+          <p class="where">{a.where}</p>
+          <p class="aprice">{a.prices}</p>
+          {a.phones.length > 0 && <ul class="phones">{a.phones.map((p) => <li><Phone num={p.num} source={p.source} /></li>)}</ul>}
+          <p class="small"><b>Deposit:</b> {a.deposit}</p>
+          <p class="small">{a.note}</p>
+          <a href={a.web} target="_blank" rel="noopener" class="web">Website →</a>
+        </article>
+      ))}
+    </div>
+
+    <div class="checklist reveal">
+      <h4>Before you sign</h4>
+      <ul>
+        <li>Tell the agency you drive to Tataouine, Douz and Tozeur. Some contracts ban unpaved tracks: ask what is covered.</li>
+        <li>Ask for comprehensive insurance (tous risques) and the excess (franchise) amount, in writing.</li>
+        <li>Check the spare tyre, the jack and the air conditioning. Film the car all around before leaving.</li>
+        <li>The main driver usually needs a licence held for 2+ years and a credit card in their name for the deposit.</li>
+        <li>Put every driver on the contract, so you can take turns on the 431 km of day 4.</li>
+        <li>Prices change daily: these are from 23 October. Drivo and the airport desks cancel free up to 48 h before, so booking early costs nothing.</li>
+        <li>Drivo delivers free to hotels within 30 km of the airport: ask if they can bring the car to your address in Sousse on Saturday morning.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rental { border-top: 1px solid var(--line); }
+  .hours { padding: 10px 14px; border-radius: 10px; background: var(--surface-2); color: var(--ink); font-size: 0.92rem; }
+  .group { font-size: var(--step-1); margin: 28px 0 12px; }
+  .cars { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+  .car { position: relative; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+  .car.pick { border: 2px solid var(--pink); overflow: visible; }
+  .car.pick .car-ph { border-radius: 16px 16px 0 0; }
+  .pick-tag.alt { background: var(--accent); }
+  .pick-tag { position: absolute; z-index: 2; top: -12px; left: 16px; padding: 2px 10px; border-radius: 999px; background: var(--pink); color: #fff; font: 600 0.7rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  .car-ph { padding: 0; border: 0; cursor: zoom-in; overflow: hidden; aspect-ratio: 16 / 10; background: var(--surface-2); }
+  .car-ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .car-ph:hover img { transform: scale(1.04); }
+  .car-body { padding: 16px 18px 18px; display: grid; gap: 6px; }
+  h4 { font: 700 var(--step-1) var(--f-display); }
+  h4 small { font: 500 0.75rem var(--f-body); color: var(--muted); }
+  .offers { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 4px; }
+  .offers li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 10px; border-radius: 8px; background: var(--surface-2); font-size: 0.88rem; }
+  .offers li.low { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+  .offers li.low b { color: var(--accent); }
+  .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 6px 0; padding: 10px 0; border-block: 1px solid var(--line); }
+  .specs dt { font: 600 0.64rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .specs dd { margin: 0; font-weight: 600; font-size: 0.9rem; }
+  .verdict { font-weight: 600; font-size: 0.92rem; }
+  .pros, .cons { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 0.86rem; }
+  .pros li::before { content: '+ '; color: var(--accent); font-weight: 700; }
+  .cons li::before { content: '– '; color: var(--pink); font-weight: 700; }
+  .use { justify-self: start; margin-top: 8px; }
+  .fourbyfour { margin-top: 18px; max-width: 80ch; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); font-size: 0.95rem; }
+  .ag-title { font-size: var(--step-2); margin: clamp(32px, 5vw, 56px) 0 14px; }
+  .agencies { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .ag { padding: 18px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .where { color: var(--muted); font-size: 0.85rem; }
+  .aprice { font-weight: 600; font-size: 0.92rem; }
+  .phones { list-style: none; padding: 0; margin: 4px 0; display: grid; gap: 6px; }
+  .small { font-size: 0.85rem; color: var(--muted); }
+  .web { margin-top: auto; font-weight: 600; font-size: 0.9rem; }
+  .checklist { margin-top: 20px; padding: 18px 20px; border-radius: var(--radius); border: 1px dashed var(--line); }
+  .checklist ul { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 6px; color: var(--muted); font-size: 0.93rem; }
+</style>
