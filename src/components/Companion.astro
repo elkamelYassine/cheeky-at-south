@@ -117,7 +117,14 @@
     markers.forEach((m, i) => m.getElement()?.firstElementChild?.classList.toggle('on', i === si));
     activeLeg.setLatLngs(d.legs[si] || []);
     $('cmp-steps').querySelectorAll('li').forEach((li) => li.classList.toggle('on', Number((li as HTMLElement).dataset.i) === si));
-    $('cmp-steps').querySelector('li.on')?.scrollIntoView({ block: 'nearest' });
+    // keep the active stop visible inside the list only (scrollIntoView would also scroll the page)
+    const list = $('cmp-steps');
+    const on = list.querySelector<HTMLElement>('li.on');
+    if (on) {
+      const top = on.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop;
+      if (top < list.scrollTop) list.scrollTop = top;
+      else if (top + on.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top + on.offsetHeight - list.clientHeight;
+    }
 
     $('cmp-now').textContent = `${s.time} · ${s.name}`;
     $('cmp-now-2').textContent = s.name;

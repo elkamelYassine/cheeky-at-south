@@ -24,6 +24,9 @@ const { title, description } = Astro.props;
     />
     <script is:inline>
       document.documentElement.classList.add('js');
+      // a reload opens at the top, unless the link points to a section (#map, #d2…)
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if (!location.hash) window.scrollTo(0, 0);
       try {
         const t = localStorage.getItem('theme');
         if (t === 'light') document.documentElement.dataset.theme = 'light';
