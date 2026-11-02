@@ -1,17 +1,17 @@
 ---
 import Phone from './Phone.astro';
 import Media from './Media.astro';
-import { nights, stops } from '../data/trip.mjs';
+import { nights, trip } from '../data/trip.mjs';
+import { tnd } from '../lib/budget.mjs';
 ---
 <section class="section" id="hotels">
   <div class="wrap">
     <div class="section-head reveal">
-      <p class="eyebrow">3 nights · 4 people</p>
-      <h2>Where to sleep</h2>
+      <p class="eyebrow">All booked · 4 people</p>
+      <h2>Where we sleep</h2>
       <p>
-        Prices are per person per night, half board (dinner and breakfast), the way Tunisian hotels quote them.
-        They are estimates for early November. Phone directly: the rate for Tunisian residents is usually below what booking sites show.
-        Numbers come from public listings, and the source is noted next to each one.
+        Three nights on the road, then three nights by the sea in Hammam Sousse. Everything below is confirmed.
+        Prices are totals for the four of you. Airbnb charged in euros, converted at 1 € ≈ 3.36 TND.
       </p>
     </div>
 
@@ -20,33 +20,29 @@ import { nights, stops } from '../data/trip.mjs';
         <h3 class="night-title"><span class="eyebrow">{n.label}</span>{n.area}</h3>
         <div class="opts">
           {n.options.map((o) => (
-            <article class:list={['opt', { pick: o.pick }]} id={`hotel-${o.id}`}>
-              {o.pick && <span class="pick-tag">Our pick</span>}
+            <article class="opt pick" id={`hotel-${o.id}`}>
+              <span class="pick-tag">Booked</span>
               <h4>{o.name}</h4>
-              <p class="type">{o.type}</p>
-              <p class="price"><b class="mono">≈ {o.pp}</b> TND <small>/ person · range {o.range[0]}–{o.range[1]}</small></p>
-              <p class="room mono">≈ {o.pp * 4} TND for the four of you</p>
-              {o.phones.length > 0 ? (
+              <p class="type">{o.type} · via {o.via}</p>
+              <p class="price"><b class="mono">{o.approxPrice ? '≈ ' : ''}{tnd(o.total)}</b> <small>for the four of you</small></p>
+              <p class="room mono">{o.approxPrice ? '≈ ' : ''}{Math.round(o.total / trip.crew)} TND per person{o.nightsCount ? ` · ${o.nightsCount} nights` : ''}</p>
+              <dl class="facts">
+                <div><dt>Check-in</dt><dd>{o.checkin}</dd></div>
+                <div><dt>Checkout</dt><dd>{o.checkout}</dd></div>
+                {o.rooms && <div><dt>Rooms</dt><dd>{o.rooms}</dd></div>}
+                <div><dt>Meals</dt><dd>{o.meals}</dd></div>
+                <div><dt>Payment</dt><dd>{o.paid}</dd></div>
+              </dl>
+              {o.phones.length > 0 && (
                 <ul class="phones">{o.phones.map((p) => <li><Phone num={p.num} source={p.source} /></li>)}</ul>
-              ) : (
-                <p class="nophone">No public number found.</p>
               )}
-              {o.contact && <p class="contact">Ask for <b>{o.contact}</b></p>}
-              {o.email && <p class="contact"><a href={`mailto:${o.email}`}>{o.email}</a></p>}
-              {o.web && <p class="contact"><a href={o.web} target="_blank" rel="noopener">{o.web.replace('https://', '')}</a></p>}
+              {o.contact && <p class="contact">Contact: <b>{o.contact}</b></p>}
+              {o.web && <p class="contact"><a href={o.web} target="_blank" rel="noopener">See the listing on Airbnb</a></p>}
               <p class="onote">{o.note}</p>
-              {o.photos && <Media photoKey={o.photos} name={o.name} limit={1} />}
+              {o.photos && <Media photoKey={o.photos} name={o.name} limit={3} />}
             </article>
           ))}
         </div>
-        {k === 'n1' && (
-          <article class="alt" id="n1-alt">
-            <span class="eyebrow">If you sleep in Tataouine</span>
-            <h4>{stops['ouled-soltane'].name} <span class="ar" lang="ar" dir="rtl">{stops['ouled-soltane'].ar}</span></h4>
-            <p>{stops['ouled-soltane'].body}</p>
-            <Media photoKey="ouled-soltane" name={stops['ouled-soltane'].name} limit={2} />
-          </article>
-        )}
       </div>
     ))}
   </div>
@@ -68,6 +64,10 @@ import { nights, stops } from '../data/trip.mjs';
   .nophone { color: var(--muted); font-size: 0.88rem; margin-top: 8px; }
   .contact { font-size: 0.9rem; overflow-wrap: anywhere; }
   .onote { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+  .facts { display: grid; gap: 4px; margin: 8px 0 0; font-size: 0.88rem; }
+  .facts div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); gap: 8px; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; }
   .opt :global(.media) { margin-top: auto; padding-top: 12px; }
   .alt { margin-top: 14px; padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); display: grid; gap: 6px; }
   .alt h4 { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }

@@ -14,15 +14,14 @@ const points = sch.flatMap((s) =>
     time: it.arrive, leave: it.leave, stay: it.stay, legKm: it.leg?.km ?? 0, legMin: it.leg?.min ?? 0, dep: i === 0 && s.day.n > 1, summary: it.stop.summary, thumb: thumb(it.stop.photos),
   })),
 );
-// extra places off the main route (day 3 afternoon option, Ksar Ouled Soltane)
+// extra places off the main route (day 3 afternoon option)
 const extras = days.flatMap((d) => (d.extras || []).map((id) => ({
   day: d.id, id, anchor: `${d.id}-${id}`, name: stops[id].name, ar: stops[id].ar, lat: stops[id].lat, lon: stops[id].lon,
   summary: stops[id].summary, thumb: thumb(stops[id].photos), detour: stops[id].detour, extra: true,
 })));
-extras.push({ day: 'd2', id: 'ouled-soltane', anchor: 'n1-alt', name: stops['ouled-soltane'].name, ar: stops['ouled-soltane'].ar, lat: stops['ouled-soltane'].lat, lon: stops['ouled-soltane'].lon, summary: stops['ouled-soltane'].summary, thumb: thumb('ouled-soltane'), detour: stops['ouled-soltane'].detour, extra: true });
 
 const hotels = Object.entries(nights).flatMap(([k, n]) => n.options.map((o) => ({
-  night: k, id: o.id, anchor: `hotel-${o.id}`, name: o.name, type: o.type, lat: o.lat, lon: o.lon, pp: o.pp, pick: !!o.pick, label: n.label,
+  night: k, id: o.id, anchor: `hotel-${o.id}`, name: o.name, type: o.type, lat: o.lat, lon: o.lon, pp: Math.round(o.total / 4), approx: !!o.approxPrice, meals: o.meals, pick: !!o.pick, label: n.label,
 })));
 
 const lines = sch.map((s) => ({ day: s.day.id, n: s.day.n, short: s.day.short, title: s.day.title, line: s.line, km: s.km, drive: dur(s.driving) }));
@@ -53,7 +52,7 @@ const data = { points, extras, hotels, lines, swap: routes['d3-swap'].line };
     <p class="legend">
       <span><b class="dot"></b>Planned stop</span>
       <span><b class="dot opt">+</b>Optional detour</span>
-      <span><b class="dot hotel"></b>Hotel option</span>
+      <span><b class="dot hotel"></b>Where we sleep</span>
       <span><b class="dash"></b>Mos Espa option (day 3)</span>
     </p>
   </div>
@@ -163,7 +162,7 @@ const data = { points, extras, hotels, lines, swap: routes['d3-swap'].line };
   const bed = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 7h2v6h6V8h7a3 3 0 0 1 3 3v6h-2v-2H5v2H3V7Zm5 1a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg>';
   for (const h of data.hotels) {
     const m = L.marker([h.lat, h.lon], { icon: L.divIcon({ className: '', html: `<span class="pin hotel ${h.pick ? 'pick' : ''}">${bed}</span>`, iconSize: [24, 24] }), title: h.name });
-    m.bindTooltip(card({ name: h.name, summary: `${h.label} · ${h.type}` }, `<p class="mono small">≈ ${h.pp} TND / person, half board${h.pick ? ' · our pick' : ''}</p>`), { direction: 'top', offset: [0, -14], className: 'card-tt', opacity: 1 });
+    m.bindTooltip(card({ name: h.name, summary: `${h.label} · ${h.type}` }, `<p class="mono small">Booked · ${h.approx ? '≈ ' : ''}${h.pp} TND / person · ${h.meals}</p>`), { direction: 'top', offset: [0, -14], className: 'card-tt', opacity: 1 });
     m.on('click', () => go(h.anchor));
     m.addTo(hotelLayer);
   }

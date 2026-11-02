@@ -2,7 +2,7 @@
 import Media from './Media.astro';
 import Phone from './Phone.astro';
 import { schedule, dur, legOf } from '../lib/schedule.mjs';
-import { stops, nights } from '../data/trip.mjs';
+import { stops, nights, trip } from '../data/trip.mjs';
 import routes from '../data/routes.json';
 
 const { day } = Astro.props;
@@ -38,10 +38,10 @@ const swapMin = Math.round(swap.legs.reduce((a, l) => a + legOf(l).raw, 0) / 5) 
           <div class="rail"><time class="mono">{it.arrive}</time></div>
           <article class="card">
             <div class="kicker"><span class="kind">Leave</span></div>
-            <h3>{it.id === 'sun-palm' ? 'Hotel Mehari Douz' : it.id === 'tozeur-hotel' ? 'Tozeur hotel' : it.stop.name} <span class="ar" lang="ar" dir="rtl">{it.stop.ar}</span></h3>
-            {day.id === 'd3' && <p class="body small">Breakfast at 08:00, leave at 09:00. Fuel up in Douz or Kebili on the way out.</p>}
-            {day.id === 'd2' && <p class="body small">Breakfast from 07:00. Walk the courtyards at sunrise (06:40) before it.</p>}
-            {day.id === 'd4' && <p class="body small">Breakfast at 06:45, bags in the car, leave at 07:30.</p>}
+            <h3>{it.id === 'douz-hotel' ? 'Hotel Sahara Douz' : it.id === 'tozeur-hotel' ? 'Marabout Guest House' : it.id === 'tataouine-night' ? 'Airbnb, Tataouine' : it.stop.name} <span class="ar" lang="ar" dir="rtl">{it.stop.ar}</span></h3>
+            {day.id === 'd3' && <p class="body small">Breakfast at the hotel at 08:00 (included), leave at 09:00. Fuel up in Douz or Kebili on the way out.</p>}
+            {day.id === 'd2' && <p class="body small">Quick breakfast in town and leave at 07:45.</p>}
+            {day.id === 'd4' && <p class="body small">No breakfast at the Airbnb: coffee and something quick, bags in the car, leave at 07:30. Hand the keys back the way Hedi asks.</p>}
           </article>
         </li>
       ) : (
@@ -110,8 +110,8 @@ const swapMin = Math.round(swap.legs.reduce((a, l) => a + legOf(l).raw, 0) / 5) 
     <div>
       <a class="sleep reveal" href={`#hotel-${pick.id}`}>
         <span class="eyebrow">{night.label} · {night.area}</span>
-        <b>Sleep at {pick.name}</b>
-        <span class="muted">≈ {pick.pp} TND per person, half board · {night.options.length - 1} alternatives in Hotels →</span>
+        <b>{night.after ? 'Then three nights at the ' : 'Sleep at '}{pick.name}</b>
+        <span class="muted">Booked · {pick.approxPrice ? '≈ ' : ''}{Math.round(pick.total / trip.crew)} TND per person{night.after ? ' for the 3 nights' : ''} · {pick.meals.toLowerCase()} · details in Where we sleep →</span>
       </a>
     </div>
   )}

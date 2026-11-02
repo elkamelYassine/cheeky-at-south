@@ -4,14 +4,15 @@ import { nights } from '../data/trip.mjs';
 
 const pick = (k) => nights[k].options.find((o) => o.pick);
 const calls = [
-  { when: 'Now', who: pick('n1').name, why: 'Room for 4, Sat 7 Nov, half board', phone: pick('n1').phones[0], anchor: 'hotel-hadada' },
-  { when: 'Now', who: 'Hotel Mehari Douz (ask for Mokhtar)', why: 'Room for 4, Sun 8 Nov, half board', phone: nights.n2.options[1].phones[0], anchor: 'hotel-mehari' },
-  { when: 'Now', who: pick('n3').name, why: 'Room for 4, Mon 9 Nov, half board', phone: pick('n3').phones[0], anchor: 'hotel-rasain' },
-  { when: 'If renting', who: 'Drivo Tunisie: Toyota RAV4 (or Ford Ranger)', why: 'Hand-over Sat 7 Nov around 07:00 at Monastir airport (or delivered in Sousse), return Tue 10 Nov evening. Free cancellation up to 48 h before', phone: { num: '+216 23 172 991', source: 'Drivo, also WhatsApp' }, anchor: 'rental' },
+  { when: 'Before 4 Nov', who: 'Print the Hotel Sahara Douz voucher', why: 'It is in Marouane’s email (Tunisiebooking). Free cancellation ends on 4 Nov', phone: null, anchor: 'hotel-sahara' },
+  { when: 'Fri 6 Nov', who: 'Marrak: Mahindra XUV 3XO (reserved)', why: 'Fix the hand-over: Sat 7 Nov around 07:00 in Sousse, return Tue 10 Nov evening. Ask about insurance, km and the deposit', phone: null, anchor: 'car-xuv3xo' },
   { when: 'Week before', who: 'Jamel / Jmed (quad, Douz)', why: 'Quad Sun 8 Nov at 16:40 for the sunset, pick-up at the hotel. Agree the price per quad', phone: { num: '+216 96 345 597', source: 'your draft' }, anchor: 'd2-douz-dune' },
   { when: 'Fri 6 Nov', who: 'Massoud, Hotel Sidi Driss', why: 'Lunch for 4 on Sat 7 Nov around 13:30', phone: { num: '+216 75 240 005', source: 'hotel line, ask for Massoud' }, anchor: 'd1-sidi-driss' },
-  { when: 'Sun 8 Nov', who: 'Hotel Mehari Douz', why: 'Say you arrive around 16:20 and go straight out on the quad. Ask them to keep dinner', phone: null, anchor: 'hotel-mehari' },
+  { when: 'Sat 7 Nov', who: 'Braiek (Airbnb, Tataouine)', why: 'Message in the Airbnb app: arrival around 18:10, and ask for the exact address', phone: null, anchor: 'hotel-tataouine' },
+  { when: 'Sun 8 Nov', who: 'Hotel Sahara Douz', why: 'Say you arrive around 16:20 and go straight out on the quad. Ask if they can serve dinner (only breakfast is booked)', phone: pick('n2').phones[0], anchor: 'hotel-sahara' },
+  { when: 'Mon 9 Nov', who: 'Hedi (Marabout Guest House, Tozeur)', why: 'Arrival around 14:00, right when check-in opens', phone: pick('n3').phones[0], anchor: 'hotel-marabout' },
   { when: 'Mon 9 Nov', who: 'Bistro 76, Gafsa', why: 'Optional: table for 4 on Tue 10 Nov around 12:40', phone: { num: '+216 28 639 726', source: 'Trip.com, name not confirmed' }, anchor: 'd4-gafsa' },
+  { when: 'Tue 10 Nov', who: 'Zied (beach villa, Hammam Sousse)', why: 'Arrival around 18:30 (check-in from 15:00). You stay until Fri 13 Nov', phone: pick('n4').phones[0], anchor: 'hotel-villa' },
 ];
 ---
 <section class="section" id="calls">

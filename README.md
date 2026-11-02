@@ -15,7 +15,7 @@ Everything lives in `src/data/trip.mjs`:
 - `stops`: text, Arabic name, coordinates, photos key, YouTube ids, tips, contacts.
 - `days`: start time, and for each stop `[id, minutes spent there]`. Arrival times are computed from
   real drive times (`src/data/routes.json`) × 1.1, rounded to 5 min (`src/lib/schedule.mjs`).
-- `nights`: hotel options, per-person half-board estimates, phone numbers with their source.
+- `nights`: the booked stays (total price for the four, check-in/out, meals, contacts). `n4` (`after: true`) is the Sousse villa after the loop.
 - `budget`: fuel price, consumption, meals, quad, tolls.
 
 After changing a stop's coordinates or the order of stops, refresh the roads:

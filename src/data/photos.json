@@ -297,17 +297,6 @@
    "thumb": "/img/douz-2-sm.jpg"
   }
  ],
- "mehari": [
-  {
-   "src": "/img/mehari-1.jpg",
-   "w": 1400,
-   "h": 1050,
-   "credit": "Robande",
-   "license": "CC BY 3.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Tunisia_2007,_Mehari_Hotel_in_Douz,_sulfur_pool_-_panoramio.jpg",
-   "thumb": "/img/mehari-1-sm.jpg"
-  }
- ],
  "chott": [
   {
    "src": "/img/chott-1.jpg",
@@ -386,17 +375,6 @@
    "license": "CC BY-SA 4.0",
    "page": "https://commons.wikimedia.org/wiki/File:Mod%C3%A8le_de_la_Grande_Mosqu%C3%A9e_de_Kairouan_au_parc_Chak_Wak,_Tozeur.jpg",
    "thumb": "/img/chakwak-2-sm.jpg"
-  }
- ],
- "ras-el-ain": [
-  {
-   "src": "/img/ras-el-ain-1.jpg",
-   "w": 1050,
-   "h": 1400,
-   "credit": "Rawen Ab",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ras_El_A%C3%AFn_Park_(Tozeur_Park)_01.jpg",
-   "thumb": "/img/ras-el-ain-1-sm.jpg"
   }
  ],
  "mos-espa": [
@@ -577,37 +555,6 @@
    "thumb": "/img/kairouan-2-sm.jpg"
   }
  ],
- "ouled-soltane": [
-  {
-   "src": "/img/ouled-soltane-1.jpg",
-   "w": 1400,
-   "h": 933,
-   "credit": "Skander zarrad",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ksar_Ouled_Soltane_Vue_3.jpg",
-   "thumb": "/img/ouled-soltane-1-sm.jpg"
-  },
-  {
-   "src": "/img/ouled-soltane-2.jpg",
-   "w": 1400,
-   "h": 1050,
-   "credit": "Ovva olfa",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ksar_Ouled_Soltane_26.jpg",
-   "thumb": "/img/ouled-soltane-2-sm.jpg"
-  }
- ],
- "ouled-debbab": [
-  {
-   "src": "/img/ouled-debbab-1.jpg",
-   "w": 1400,
-   "h": 933,
-   "credit": "Nassima Chahboun",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ksar_Ouled_Debbab_21.jpg",
-   "thumb": "/img/ouled-debbab-1-sm.jpg"
-  }
- ],
  "matmata-road": [
   {
    "src": "/img/matmata-road-v2-1.jpg",
@@ -689,17 +636,6 @@
    "page": "https://commons.wikimedia.org/wiki/File:Brik_Edennouni.JPG"
   }
  ],
- "tozeur-hotel": [
-  {
-   "src": "/img/tozeur-hotel-v2-1.jpg",
-   "thumb": "/img/tozeur-hotel-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 1050,
-   "credit": "Tsaag Valren",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Cal%C3%A8che_Tozeur_(2).jpg"
-  }
- ],
  "belvedere": [
   {
    "src": "/img/belvedere-v2-1.jpg",
@@ -740,191 +676,155 @@
    "page": "https://commons.wikimedia.org/wiki/File:Train_loaded_with_phosphate_rock,_Metlaoui_Tunisia-4298B.jpg"
   }
  ],
- "car-logan": [
+ "m-xuv3xo": [
   {
-   "src": "/img/car-logan-v2-1.jpg",
-   "thumb": "/img/car-logan-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 788,
-   "credit": "ROCostiTheBunnyCZ",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2021_Dacia_Logan_III_(front_angle_view).jpg"
+   "src": "/img/m-xuv3xo-v1-1.jpg",
+   "thumb": "/img/m-xuv3xo-v1-1-sm.jpg",
+   "w": 1280,
+   "h": 977,
+   "credit": "Sreedit",
+   "license": "CC0",
+   "page": "https://commons.wikimedia.org/wiki/File:Mahindra_XUV_3XO_2025.jpg"
   }
  ],
- "car-duster": [
+ "stay-tataouine": [
   {
-   "src": "/img/car-duster-v2-1.jpg",
-   "thumb": "/img/car-duster-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 842,
-   "credit": "Vauxford",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2018_Dacia_Duster_Comfort_1.6.jpg"
+   "src": "/img/stay-tataouine-1.jpg",
+   "thumb": "/img/stay-tataouine-1-sm.jpg",
+   "w": 1194,
+   "h": 1200,
+   "credit": "Listing photo (host Braiek)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/26702384",
+   "orig": "https://a0.muscache.com/im/pictures/c3a4cca6-180e-43a5-8c22-51f01cf50d3c.jpg"
+  },
+  {
+   "src": "/img/stay-tataouine-2.jpg",
+   "thumb": "/img/stay-tataouine-2-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Braiek)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/26702384",
+   "orig": "https://a0.muscache.com/im/pictures/983df535-ff38-49fc-8944-c14b99fce6ce.jpg"
+  },
+  {
+   "src": "/img/stay-tataouine-3.jpg",
+   "thumb": "/img/stay-tataouine-3-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Braiek)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/26702384",
+   "orig": "https://a0.muscache.com/im/pictures/534138b0-d0d7-4a6a-a8e0-ecb72babb040.jpg"
   }
  ],
- "m-virtus": [
+ "stay-sahara": [
   {
-   "src": "/img/m-virtus-v2-1.jpg",
-   "thumb": "/img/m-virtus-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 788,
-   "credit": "Dairokkan9",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2023_Volkswagen_Virtus_Topline_front_20230520.jpg"
+   "src": "/img/stay-sahara-1.jpg",
+   "thumb": "/img/stay-sahara-1-sm.jpg",
+   "w": 1000,
+   "h": 670,
+   "credit": "Hotel Sahara Douz",
+   "license": "Booking listing photo",
+   "site": "HalalBooking",
+   "page": "https://halalbooking.com/en/hotel-sahara-douz/p/86076",
+   "orig": "https://cdn.halalstatic.com/expedia%2F8000000%2F7120000%2F7117900%2F7117801%2Ff45ecae6_z.jpg?fit=bounds&format=jpg&width=1280"
+  },
+  {
+   "src": "/img/stay-sahara-2.jpg",
+   "thumb": "/img/stay-sahara-2-sm.jpg",
+   "w": 1000,
+   "h": 668,
+   "credit": "Hotel Sahara Douz",
+   "license": "Booking listing photo",
+   "site": "HalalBooking",
+   "page": "https://halalbooking.com/en/hotel-sahara-douz/p/86076",
+   "orig": "https://cdn.halalstatic.com/expedia%2F8000000%2F7120000%2F7117900%2F7117801%2Ffbdbf885_z.jpg?fit=bounds&format=jpg&width=1280"
+  },
+  {
+   "src": "/img/stay-sahara-3.jpg",
+   "thumb": "/img/stay-sahara-3-sm.jpg",
+   "w": 1000,
+   "h": 750,
+   "credit": "Hotel Sahara Douz",
+   "license": "Booking listing photo",
+   "site": "HalalBooking",
+   "page": "https://halalbooking.com/en/hotel-sahara-douz/p/86076",
+   "orig": "https://cdn.halalstatic.com/expedia%2F8000000%2F7120000%2F7117900%2F7117801%2Fadaef0a9_z.jpg?fit=bounds&format=jpg&width=1280"
   }
  ],
- "m-i20": [
+ "stay-marabout": [
   {
-   "src": "/img/m-i20-v2-1.jpg",
-   "thumb": "/img/m-i20-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 696,
-   "credit": "Alexander Migl",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Hyundai_i20_N_IMG_5400.jpg"
+   "src": "/img/stay-marabout-1.jpg",
+   "thumb": "/img/stay-marabout-1-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Hedi)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1324654930771713418",
+   "orig": "https://a0.muscache.com/im/pictures/hosting/Hosting-1324654930771713418/original/3ec3d60e-9343-402a-aef4-99ff2d6ae3ce.jpeg"
+  },
+  {
+   "src": "/img/stay-marabout-2.jpg",
+   "thumb": "/img/stay-marabout-2-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Hedi)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1324654930771713418",
+   "orig": "https://a0.muscache.com/im/pictures/hosting/Hosting-1324654930771713418/original/bf9e6ff5-ddea-4498-8792-1523be4cfdca.jpeg"
+  },
+  {
+   "src": "/img/stay-marabout-3.jpg",
+   "thumb": "/img/stay-marabout-3-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Hedi)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1324654930771713418",
+   "orig": "https://a0.muscache.com/im/pictures/hosting/Hosting-1324654930771713418/original/7551c18b-61e9-4679-b17b-635ff2bbb208.jpeg"
   }
  ],
- "m-stepway": [
+ "stay-villa": [
   {
-   "src": "/img/m-stepway-v2-1.jpg",
-   "thumb": "/img/m-stepway-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 779,
-   "credit": "Alexander Migl",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2023_Dacia_Sandero_Stepway_III_1X7A6195.jpg"
-  }
- ],
- "m-ecosport": [
+   "src": "/img/stay-villa-1.jpg",
+   "thumb": "/img/stay-villa-1-sm.jpg",
+   "w": 1200,
+   "h": 900,
+   "credit": "Listing photo (host Zied)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1195366325404114191",
+   "orig": "https://a0.muscache.com/im/pictures/hosting/Hosting-1195366325404114191/original/5fcac149-3434-419c-96bf-a80fb69380a1.jpeg"
+  },
   {
-   "src": "/img/m-ecosport-v2-1.jpg",
-   "thumb": "/img/m-ecosport-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 930,
-   "credit": "Mike-fiesta",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ford_EcoSport_Sollers.jpg"
-  }
- ],
- "m-scala": [
+   "src": "/img/stay-villa-2.jpg",
+   "thumb": "/img/stay-villa-2-sm.jpg",
+   "w": 900,
+   "h": 1200,
+   "credit": "Listing photo (host Zied)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1195366325404114191",
+   "orig": "https://a0.muscache.com/im/pictures/hosting/Hosting-1195366325404114191/original/88b662f8-2f38-4dd9-aa01-581e27d33936.jpeg"
+  },
   {
-   "src": "/img/m-scala-v2-1.jpg",
-   "thumb": "/img/m-scala-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 932,
-   "credit": "Alexander-93",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:%C5%A0koda_Scala_Facelift_IMG_8899.jpg"
-  }
- ],
- "m-kodiaq": [
-  {
-   "src": "/img/m-kodiaq-v2-1.jpg",
-   "thumb": "/img/m-kodiaq-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 786,
-   "credit": "Vauxford",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2018_Skoda_Kodiaq_Scout_TDi_SCR_4X4_2.0_Front.jpg"
-  }
- ],
- "m-rav4": [
-  {
-   "src": "/img/m-rav4-v2-1.jpg",
-   "thumb": "/img/m-rav4-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 844,
-   "credit": "Alexander Migl",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Hybrid_(XA50)_DSC_2709_(cropped).jpg"
-  }
- ],
- "m-ranger": [
-  {
-   "src": "/img/m-ranger-v2-1.jpg",
-   "thumb": "/img/m-ranger-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 790,
-   "credit": "Alexander-93",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Ford_Ranger_(T6,_P703)_Wildtrak_IMG_7320.jpg"
-  }
- ],
- "m-5008": [
-  {
-   "src": "/img/m-5008-v2-1.jpg",
-   "thumb": "/img/m-5008-v2-1-sm.jpg",
-   "w": 1300,
-   "h": 913,
-   "credit": "Navigator84",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Peugeot_5008_II_2_China_2018-04-03.jpg"
-  }
- ],
- "m-aircross": [
-  {
-   "src": "/img/m-aircross-v2-1.jpg",
-   "thumb": "/img/m-aircross-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 803,
-   "credit": "Alexander-93",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Citroen_C3_Aircross_(2017)_Facelift_1X7A7060.jpg"
-  }
- ],
- "m-mokka": [
-  {
-   "src": "/img/m-mokka-v2-1.jpg",
-   "thumb": "/img/m-mokka-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 1067,
-   "credit": "Alexander Migl",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2025_Opel_Mokka_B_DSC_9161.jpg"
-  }
- ],
- "m-308": [
-  {
-   "src": "/img/m-308-v2-1.jpg",
-   "thumb": "/img/m-308-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 833,
-   "credit": "A.BourgeoisP",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:2022_-_Peugeot_308_III_(C)_-_196.jpg"
-  }
- ],
- "m-clio": [
-  {
-   "src": "/img/m-clio-v2-1.jpg",
-   "thumb": "/img/m-clio-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 720,
-   "credit": "Alexander-93",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Renault_Clio_V_(2023)_1X7A1577.jpg"
-  }
- ],
- "m-sandero": [
-  {
-   "src": "/img/m-sandero-v2-1.jpg",
-   "thumb": "/img/m-sandero-v2-1-sm.jpg",
-   "w": 1400,
-   "h": 832,
-   "credit": "Alexander Migl",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:Dacia_Sandero_III_1X7A6451.jpg"
-  }
- ],
- "m-mgzs": [
-  {
-   "src": "/img/m-mgzs-v2-1.jpg",
-   "thumb": "/img/m-mgzs-v2-1-sm.jpg",
-   "w": 1300,
-   "h": 842,
-   "credit": "Navigator84",
-   "license": "CC BY-SA 4.0",
-   "page": "https://commons.wikimedia.org/wiki/File:MG_ZS_EV_facelift_01_France_2021-11-06.jpg"
+   "src": "/img/stay-villa-3.jpg",
+   "thumb": "/img/stay-villa-3-sm.jpg",
+   "w": 1200,
+   "h": 675,
+   "credit": "Listing photo (host Zied)",
+   "license": "Booking listing photo",
+   "site": "Airbnb",
+   "page": "https://www.airbnb.com/rooms/1195366325404114191",
+   "orig": "https://a0.muscache.com/im/pictures/miso/Hosting-1195366325404114191/original/9e98cea8-d167-4fc2-9b4e-5840559f1658.jpeg"
   }
  ]
 }

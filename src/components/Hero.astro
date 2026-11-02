@@ -2,6 +2,8 @@
 import { allSchedules, dur } from '../lib/schedule.mjs';
 import { compute, defaultState } from '../lib/budget.mjs';
 import { stops } from '../data/trip.mjs';
+import photos from '../data/photos.json';
+import { webpSrcset } from '../lib/img.mjs';
 import CheekyLogo from './CheekyLogo.astro';
 
 const sch = allSchedules();
@@ -25,11 +27,14 @@ const pathOf = (line) => {
 const dayPaths = sch.map((s) => ({ id: s.day.id, color: s.day.color, d: pathOf(s.line) }));
 const loop = dayPaths.map((p) => p.d).join('');
 const pins = [
-  ['sousse', 'Sousse', 'r'], ['ksar-hadada', 'Ksar Hadada', 'r'], ['sun-palm', 'Douz', 'l'], ['tozeur-hotel', 'Tozeur', 'l'], ['gafsa', 'Gafsa', 'l'], ['matmata', 'Matmata', 'l'], ['ksar-ghilane', 'Ksar Ghilane', 'l'],
+  ['sousse', 'Sousse', 'r'], ['tataouine-night', 'Tataouine', 'r'], ['douz-hotel', 'Douz', 'l'], ['tozeur-hotel', 'Tozeur', 'l'], ['gafsa', 'Gafsa', 'l'], ['matmata', 'Matmata', 'l'], ['ksar-ghilane', 'Ksar Ghilane', 'l'],
 ].map(([id, label, side]) => { const [x, y] = P([stops[id].lat, stops[id].lon]); return { x, y, label, side }; });
 ---
 <section class="hero" id="top">
-  <img class="hero-bg" src="/img/ksar-ghilane-1.jpg" alt="Dunes of the Grand Erg Oriental at Ksar Ghilane" fetchpriority="high" />
+  <picture>
+    <source type="image/webp" srcset={webpSrcset(photos['ksar-ghilane'][0])} sizes="100vw" />
+    <img class="hero-bg" src={photos['ksar-ghilane'][0].src} alt="Dunes of the Grand Erg Oriental at Ksar Ghilane" fetchpriority="high" />
+  </picture>
   <div class="hero-shade"></div>
   <div class="wrap hero-grid">
     <div class="hero-copy">
@@ -42,7 +47,7 @@ const pins = [
       <p class="ar hero-ar" lang="ar" dir="rtl">رحلة إلى الجنوب</p>
       <p class="lede">
         Ksour, troglodyte villages, Star Wars sets, the dunes of the Grand Erg and a salt lake you drive across.
-        Saturday 7 to Tuesday 10 November 2026, from Sousse and back.
+        Saturday 7 to Tuesday 10 November 2026, from Sousse and back, then three nights by the sea in Hammam Sousse until Friday 13.
       </p>
       <dl class="facts">
         <div><dt>Days</dt><dd class="mono" data-count="4">4</dd></div>
@@ -58,7 +63,7 @@ const pins = [
 
     <figure class="loop" aria-label="Shape of the full loop">
       <svg viewBox={`0 0 ${W} ${H}`} role="img">
-        <title>The full loop: Sousse, Matmata, Ksar Hadada, Ksar Ghilane, Douz, Tozeur, Gafsa, Kairouan, back to Sousse</title>
+        <title>The full loop: Sousse, Matmata, Ksar Hadada, Tataouine, Ksar Ghilane, Douz, Tozeur, Gafsa, Kairouan, back to Hammam Sousse</title>
         {dayPaths.map((p, i) => (
           <path d={p.d} pathLength="1" class="seg" style={`--c:${p.color};--i:${i}`} />
         ))}

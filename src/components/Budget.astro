@@ -22,15 +22,13 @@ const max = Math.max(...r.cats.map((c) => c.value));
           <legend>Car</legend>
           <div class="row two">
             <div>
-              <label for="b-car">Which car</label>
-              <select id="b-car" name="car">
-                <option value="own" selected>Our own car</option>
-                {rental.cars.map((c) => <option value={c.id}>Rent: {c.name} · {Math.round(Math.min(...c.offers.map((o) => o.total)))} TND</option>)}
-              </select>
+              <span class="lbl-static">Reserved</span>
+              <p class="car-static"><a href="#rental">{rental.cars[0].name}</a> · Marrak</p>
+              <input type="hidden" name="car" value={rental.cars[0].id} />
             </div>
-            <div><label for="b-carday">Rental total, 4 days (TND)</label><input id="b-carday" name="carTotal" type="number" step="5" value="0" disabled /></div>
+            <div><label for="b-carday">Rental total, 4 days (TND)</label><input id="b-carday" name="carTotal" type="number" step="5" value={state.carTotal} /></div>
           </div>
-          <p class="hint">Picking a car fills in its cheapest 4-day price and its fuel type and use. Collect Saturday morning, return Tuesday evening. <a href="#rental">Compare the cars</a></p>
+          <p class="hint">120 DT a day. Collect Saturday morning, return Tuesday evening.</p>
         </fieldset>
 
         <fieldset>
@@ -38,8 +36,8 @@ const max = Math.max(...r.cats.map((c) => c.value));
           <div class="row">
             <label for="b-fuel">Type</label>
             <select id="b-fuel" name="fuel">
-              <option value="petrol" selected>Petrol, sans plomb ({budget.fuel.pricePetrol} TND/L)</option>
-              <option value="diesel">Diesel, gasoil ({budget.fuel.priceDiesel} TND/L)</option>
+              <option value="petrol" selected={state.fuel === 'petrol'}>Petrol, sans plomb ({budget.fuel.pricePetrol} TND/L)</option>
+              <option value="diesel" selected={state.fuel === 'diesel'}>Diesel, gasoil ({budget.fuel.priceDiesel} TND/L)</option>
             </select>
           </div>
           <div class="row">
@@ -53,15 +51,19 @@ const max = Math.max(...r.cats.map((c) => c.value));
         </fieldset>
 
         <fieldset>
-          <legend>Hotels</legend>
-          {Object.entries(nights).map(([k, n]) => (
-            <div class="row">
-              <label for={`b-${k}`}>{n.label}</label>
-              <select id={`b-${k}`} name={k} data-night={k}>
-                {n.options.map((o) => <option value={o.id} selected={o.id === state.nights[k]}>{o.name} · ≈{o.pp} TND/pers.</option>)}
-              </select>
-            </div>
-          ))}
+          <legend>Where we sleep (booked)</legend>
+          <ul class="stays">
+            {Object.values(nights).map((n) => {
+              const o = n.options.find((x) => x.pick) || n.options[0];
+              return (
+                <li>
+                  <span><small>{n.label}</small><a href={`#hotel-${o.id}`}>{o.name}</a></span>
+                  <span class="mono">{o.approxPrice ? '≈ ' : ''}{tnd(o.total)}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <p class="hint">Totals for the four of you. Airbnb prices were paid in euros, shown at 1 € ≈ 3.36 TND. The Tataouine price is approximate.</p>
         </fieldset>
 
         <fieldset>
@@ -109,9 +111,9 @@ const max = Math.max(...r.cats.map((c) => c.value));
           <ul>
             {budget.meals.map((m) => <li><span>{m.label}</span><span class="mono">{m.pp} TND</span></li>)}
           </ul>
-          <p class="hint">Dinners and breakfasts are inside the half-board hotel price. "Sandwich & go" is × 0.75, "Treat ourselves" × 1.35.</p>
+          <p class="hint">Hotel Sahara Douz includes breakfast. The Airbnbs have no meals, so the three dinners are counted here (20 TND each). Breakfasts are not counted. Meals during the Sousse stay are not included. "Sandwich & go" is × 0.75, "Treat ourselves" × 1.35.</p>
         </details>
-        <p class="hint">Not included: wear on your own car, the rental deposit (held on a card, then released), a 4x4 for Mos Espa if you hire one, souvenirs beyond dates and makroudh. The A1 toll is an estimate.</p>
+        <p class="hint">Not included: the car deposit (held by Marrak, then returned), a 4x4 for Mos Espa if you hire one, breakfasts, souvenirs (dates, makroudh). The A1 toll is an estimate.</p>
       </div>
     </div>
   </div>
@@ -120,7 +122,7 @@ const max = Math.max(...r.cats.map((c) => c.value));
 
 <script>
   import { compute, tnd } from '../lib/budget.mjs';
-  import { budget, rental } from '../data/trip.mjs';
+  import { budget } from '../data/trip.mjs';
 
   const form = document.getElementById('budget-form') as HTMLFormElement;
   const state = JSON.parse(document.getElementById('budget-state')!.textContent!);
@@ -136,8 +138,7 @@ const max = Math.max(...r.cats.map((c) => c.value));
     state.hours = Number(f.get('hours')) || 0;
     state.quadPrice = Number(f.get('quadPrice')) || 0;
     state.car = f.get('car');
-    state.carTotal = state.car === 'own' ? 0 : Number(($('b-carday') as HTMLInputElement).value) || 0;
-    for (const k of Object.keys(state.nights)) state.nights[k] = f.get(k);
+    state.carTotal = Number(($('b-carday') as HTMLInputElement).value) || 0;
   };
   const render = () => {
     read();
@@ -156,29 +157,6 @@ const max = Math.max(...r.cats.map((c) => c.value));
   ($('b-fuel') as HTMLSelectElement).addEventListener('change', (e) => {
     ($('b-price') as HTMLInputElement).value = String((e.target as HTMLSelectElement).value === 'diesel' ? budget.fuel.priceDiesel : budget.fuel.pricePetrol);
     render();
-  });
-  // choosing a car sets its daily price, fuel type and consumption
-  const pickCar = (id: string) => {
-    const sel = $('b-car') as HTMLSelectElement;
-    sel.value = id;
-    const car = rental.cars.find((c) => c.id === id);
-    const day = $('b-carday') as HTMLInputElement;
-    day.disabled = !car;
-    day.value = car ? String(Math.round(Math.min(...car.offers.map((o) => o.total)))) : '0';
-    if (car) {
-      ($('b-cons') as HTMLInputElement).value = String(car.consumption);
-      ($('b-fuel') as HTMLSelectElement).value = car.fuel;
-      ($('b-price') as HTMLInputElement).value = String(car.fuel === 'diesel' ? budget.fuel.priceDiesel : budget.fuel.pricePetrol);
-    }
-    render();
-  };
-  ($('b-car') as HTMLSelectElement).addEventListener('change', (e) => pickCar((e.target as HTMLSelectElement).value));
-  // "Use this car in the budget" buttons in the rental section
-  document.addEventListener('click', (e) => {
-    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-use-car]');
-    if (!b) return;
-    pickCar(b.dataset.useCar!);
-    document.getElementById('budget')?.scrollIntoView({ behavior: 'smooth' });
   });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
@@ -208,6 +186,13 @@ const max = Math.max(...r.cats.map((c) => c.value));
   .seg input:checked + span { background: var(--pink); color: var(--on-accent); border-color: var(--pink); }
   .seg input:focus-visible + span { outline: 3px solid var(--pink); outline-offset: 2px; }
   .hint { font-size: 0.82rem; color: var(--muted); }
+  .lbl-static { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+  .car-static { font-weight: 600; padding: 9px 0; }
+  .stays { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .stays li { display: flex; justify-content: space-between; align-items: end; gap: 12px; font-size: 0.92rem; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+  .stays li > span:first-child { display: grid; min-width: 0; }
+  .stays small { color: var(--muted); font-size: 0.78rem; }
+  .stays .mono { white-space: nowrap; }
 
   .result { position: sticky; top: 80px; display: grid; gap: 16px; padding: clamp(18px, 3vw, 28px); border-radius: var(--radius); background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line), var(--shadow); }
   .totals { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: end; }
