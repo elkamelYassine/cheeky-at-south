@@ -51,7 +51,7 @@ const max = Math.max(...r.cats.map((c) => c.value));
         </fieldset>
 
         <fieldset>
-          <legend>Where we sleep (booked)</legend>
+          <legend>Hébergement (booked)</legend>
           <ul class="stays">
             {Object.values(nights).map((n) => {
               const o = n.options.find((x) => x.pick) || n.options[0];

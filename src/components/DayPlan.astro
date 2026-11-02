@@ -111,7 +111,7 @@ const swapMin = Math.round(swap.legs.reduce((a, l) => a + legOf(l).raw, 0) / 5) 
       <a class="sleep reveal" href={`#hotel-${pick.id}`}>
         <span class="eyebrow">{night.label} · {night.area}</span>
         <b>{night.after ? 'Then three nights at the ' : 'Sleep at '}{pick.name}</b>
-        <span class="muted">Booked · {pick.approxPrice ? '≈ ' : ''}{Math.round(pick.total / trip.crew)} TND per person{night.after ? ' for the 3 nights' : ''} · {pick.meals.toLowerCase()} · details in Where we sleep →</span>
+        <span class="muted">Booked · {pick.approxPrice ? '≈ ' : ''}{Math.round(pick.total / trip.crew)} TND per person{night.after ? ' for the 3 nights' : ''} · {pick.meals.toLowerCase()} · details in Hébergement →</span>
       </a>
     </div>
   )}
