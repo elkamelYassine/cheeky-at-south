@@ -329,10 +329,10 @@ export const nights = {
     options: [
       {
         id: 'tataouine', name: 'Airbnb in Tataouine', type: 'Airbnb · hosted by Braiek', lat: 32.9457, lon: 10.4678, approx: true,
-        total: Math.round(110 * USD_TND), usd: 110, pick: true, photos: 'stay-tataouine',
+        total: Math.round(103 * USD_TND), usd: 103, pick: true, photos: 'stay-tataouine',
         via: 'Airbnb', checkin: 'Sat 7 Nov, evening', checkout: 'Sun 8 Nov, morning',
         meals: 'No meals booked',
-        paid: '110 $ for the night (≈ 330 TND at 1 $ ≈ 3.00 TND)',
+        paid: '103 $ for the night (≈ 309 TND at 1 $ ≈ 3.00 TND)',
         phones: [],
         contact: 'Braiek, through the Airbnb app',
         web: 'https://www.airbnb.com/rooms/26702384',
