@@ -320,18 +320,19 @@ export const days = [
 ];
 
 // Booked stays (confirmed 2 Nov 2026). `total` is what the four of you pay, in TND.
-// Airbnb charged in euros: converted at 1 € ≈ 3.36 TND (the rate used for the car rental).
+// Airbnb charged in euros (1 € ≈ 3.36 TND) and, for Tataouine, in dollars (1 $ ≈ 3.00 TND).
 export const EUR_TND = 3.36;
+export const USD_TND = 2.998; // Wise mid-market rate, 2 Nov 2026
 export const nights = {
   n1: {
     label: 'Night 1 · Sat 7 Nov', area: 'Tataouine',
     options: [
       {
         id: 'tataouine', name: 'Airbnb in Tataouine', type: 'Airbnb · hosted by Braiek', lat: 32.9457, lon: 10.4678, approx: true,
-        total: 280, approxPrice: true, pick: true, photos: 'stay-tataouine',
+        total: Math.round(110 * USD_TND), usd: 110, pick: true, photos: 'stay-tataouine',
         via: 'Airbnb', checkin: 'Sat 7 Nov, evening', checkout: 'Sun 8 Nov, morning',
         meals: 'No meals booked',
-        paid: 'About 70 TND per person (approximate)',
+        paid: '110 $ for the night (≈ 330 TND at 1 $ ≈ 3.00 TND)',
         phones: [],
         contact: 'Braiek, through the Airbnb app',
         web: 'https://www.airbnb.com/rooms/26702384',
