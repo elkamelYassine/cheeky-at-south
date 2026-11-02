@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/sw.mjs",
     "preview": "astro preview",
     "routes": "node scripts/route.mjs",
     "videos": "node scripts/videos.mjs"
