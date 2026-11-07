@@ -16,14 +16,14 @@ export const stops = {
     name: 'Sousse', ar: 'سوسة', lat: 35.8288, lon: 10.6405, kind: 'start',
     photos: 'sousse',
     summary: 'Start and finish. Full tank, A1 motorway south.',
-    body: 'Meet at 07:15, load the car, leave at 07:30 as planned. Take the A1 motorway south towards Sfax and Gabès.',
+    body: 'Left at 10:00 instead of 07:30, so day 1 is shortened (see the day note). Take the A1 motorway south towards Sfax and Gabès.',
     tips: ['Fill the tank in Sousse the evening before.', 'Coins for the A1 tolls (about 8 TND to Gabès, estimate).'],
   },
   agareb: {
     name: 'Agareb rest stop', ar: 'عقارب', lat: 34.7493, lon: 10.603, kind: 'stop',
     photos: 'agareb',
     summary: 'First coffee break on the A1, south of Sfax.',
-    body: 'The kiosk on the A1 next to Agareb. Coffee, toilets, stretch. Your draft had 10:15 here, but Google Maps puts it 1 h 30 from Sousse, so you will be there around 09:00.',
+    body: 'The kiosk on the A1 next to Agareb. Coffee, toilets, stretch. With the 10:00 departure you are here around 11:30: keep it to 10 minutes.',
     tips: ['Top up fuel here or in Gabès. The next big station is in Ghomrassen.'],
   },
   'chenini-gabes': {
@@ -57,7 +57,7 @@ export const stops = {
     name: 'Hotel Sidi Driss: lunch', ar: 'نزل سيدي إدريس', lat: 33.5427, lon: 9.9673, kind: 'meal',
     photos: 'sidi-driss', videos: ['LBOsNQKm42w'],
     summary: 'Lunch inside Luke Skywalker\'s home. Ask for Massoud.',
-    body: 'The Lars homestead interiors of Star Wars (1977) were filmed in this troglodyte hotel, and some of the set is still painted on the walls. Have lunch here. Call Massoud the day before so the meal for four is ready when you arrive.',
+    body: 'The Lars homestead interiors of Star Wars (1977) were filmed in this troglodyte hotel, and some of the set is still painted on the walls. Have lunch here. With the late start you arrive around 14:20: call Massoud so the meal for four is ready.',
     contacts: [
       { label: 'Massoud', note: 'your contact (number from your friends)' },
       { label: 'Hotel Sidi Driss', phone: '+216 75 240 005', source: 'Sygic travel guide listing' },
@@ -68,7 +68,7 @@ export const stops = {
     name: 'Toujane', ar: 'توجان', lat: 33.4658, lon: 10.1311, kind: 'stop',
     photos: 'toujane', videos: ['40t4FJ-PuL0'],
     summary: 'Berber village split across two hills of the Dahar. Best viewpoint of the day.',
-    body: 'The road from Matmata to Toujane is the "landscape road" from your draft: switchbacks, olive terraces and stone villages that blend into the rock. Stop at the top of the pass above the village for the view, then drive down through it.',
+    body: 'The road from Matmata to Toujane is the "landscape road" from your draft: switchbacks, olive terraces and stone villages that blend into the rock. Stop at the top of the pass above the village for the view, then drive down through it. With the late start this is the last sight of the day: from here take the main road to Medenine and Tataouine before it gets dark.',
     tips: ['Roadside stalls sell rugs and local honey.'],
   },
   'dkhilet-toujane': {
@@ -80,20 +80,20 @@ export const stops = {
   'ksar-hallouf': {
     name: 'Ksar Hallouf', ar: 'قصر الحلوف', lat: 33.2912, lon: 10.1573, kind: 'stop',
     photos: 'ksar-hallouf', videos: ['PR72D8x7m7s'],
-    summary: 'Hilltop granary with a huge view. You get here in the late golden hour.',
-    body: 'A fortified granary (ksar) on a rocky spur: rows of vaulted ghorfas where the families of the valley stored grain and oil. You arrive late afternoon, when the light turns gold over the plain. You drive past it again on day 2. Climb to the top terrace for the photo of the day.',
+    summary: 'Hilltop granary with a huge view. Quick photo stop on day 2.',
+    body: 'A fortified granary (ksar) on a rocky spur: rows of vaulted ghorfas where the families of the valley stored grain and oil. Moved to the morning of day 2: a short detour from Beni Khedache on the way to Ksar Ghilane. Climb to the top terrace for the view. Skip it if day 2 runs late.',
   },
   'beni-khedache': {
     name: 'Beni Khedache', ar: 'بني خداش', lat: 33.2514, lon: 10.2001, kind: 'drive',
     photos: 'beni-khedache',
-    summary: 'Mountain town with old ksar ruins. Quick pass, sunset is close.',
-    body: 'The main town of the Dahar plateau. You can see the remains of its ksar from the road. Keep moving: the last 25 km to Ksar Hadada are best done before dark.',
+    summary: 'Mountain town with old ksar ruins. Drive through on day 2.',
+    body: 'The main town of the Dahar plateau. You can see the remains of its ksar from the road. On day 2 you come up from Ksar Hadada, take the short detour to Ksar Hallouf, then head west on the C114 to Ksar Ghilane.',
   },
   'ksar-hadada': {
     name: 'Ksar Hadada', ar: 'قصر حدادة', lat: 33.1004, lon: 10.3119, kind: 'stop',
     photos: 'ksar-hadada', videos: ['ENfS9LK-Gyg'],
-    summary: 'Sunset stop in the Star Wars slave quarters of Mos Espa.',
-    body: 'Part of this ksar was turned into a guesthouse, and its courtyards were used as the slave quarters of Mos Espa in Star Wars Episode I. You arrive just before sunset: walk the courtyards and the granaries while there is light, then drive the last half hour to Tataouine.',
+    summary: 'The Star Wars slave quarters of Mos Espa. Moved to day 2 morning.',
+    body: 'Part of this ksar was turned into a guesthouse, and its courtyards were used as the slave quarters of Mos Espa in Star Wars Episode I. Moved to the morning of day 2 (it is only 7 km from Ghomrassen): walk the courtyards and the granaries, then go on to Beni Khedache and Ksar Ghilane. Do not skip this one.',
   },
   'tataouine-night': {
     name: 'Tataouine: Airbnb (Braiek)', ar: 'تطاوين', lat: 32.9457, lon: 10.4678, kind: 'night', approx: true,
@@ -144,7 +144,7 @@ export const stops = {
     name: 'Quad at sunset', ar: 'كثبان دوز', lat: 33.439, lon: 9.006, kind: 'activity', approx: true,
     photos: 'quad', videos: ['Cy7rZWVngVU'],
     summary: 'Quad into the dunes with Jamel, as in your draft. Sunset is at 17:26.',
-    body: 'With the real drive times you reach Douz around 16:20, so the quad fits before dark. Ride out into the dunes, stop on a crest for the sunset at 17:26, and come back at dusk. Call Jamel the day before and fix 16:40 at the hotel.',
+    body: 'With the new plan you reach Douz around 16:35, so the quad still starts before sunset. Ride out into the dunes, stop on a crest for the sunset at 17:26, and come back at dusk. Call Jamel the day before and fix 16:40 at the hotel.',
     contacts: [
       { label: 'Jamel (quad manager)', note: 'from your draft' },
       { label: 'Jmed (quad)', phone: '+216 96 345 597', source: 'your draft' },
@@ -273,14 +273,13 @@ export const days = [
   {
     id: 'd1', n: 1, date: '2026-11-07', weekday: 'Saturday', short: 'Sat 7 Nov',
     title: 'Coast to the ksour', from: 'Sousse', to: 'Tataouine',
-    start: '07:30', sunrise: '06:42', sunset: '17:22',
+    start: '10:00', sunrise: '06:42', sunset: '17:22',
     color: 'var(--d1)',
     stops: [
-      ['sousse', 0], ['agareb', 15], ['chenini-gabes', 45], ['jara', 35], ['matmata-new', 0], ['matmata', 25],
-      ['sidi-driss', 60], ['toujane', 20], ['dkhilet-toujane', 0], ['ksar-hallouf', 20], ['beni-khedache', 0], ['ksar-hadada', 20],
-      ['tataouine-night', 0],
+      ['sousse', 0], ['agareb', 10], ['matmata-new', 0], ['matmata', 20],
+      ['sidi-driss', 60], ['toujane', 20], ['tataouine-night', 0],
     ],
-    note: 'Your 07:30 departure works: with Google Maps drive times you reach Ksar Hadada around 17:15, just before sunset (17:22), and the Airbnb in Tataouine about half an hour later, after dark. Do not let the Gabès stops run over.',
+    note: 'Updated on the road: you left at 10:00, not 07:30. Gabès (Chenini oasis, Jara souk) is dropped, lunch at Sidi Driss moves to about 14:20, and Ksar Hallouf and Ksar Hadada move to the morning of day 2. You see Toujane in daylight, then take the main road via Medenine to Tataouine, so only that part is after dark. If you reach Gabès before 13:00, a 20-minute stop in Jara still fits.',
     night: 'n1',
   },
   {
@@ -288,8 +287,8 @@ export const days = [
     title: 'Ksour, then the sand', from: 'Tataouine', to: 'Douz',
     start: '07:45', sunrise: '06:48', sunset: '17:26',
     color: 'var(--d2)',
-    stops: [['tataouine-night', 0], ['chenini-tataouine', 60], ['guermessa', 30], ['ghomrassen', 30], ['ksar-ghilane', 105], ['douz', 0], ['douz-hotel', 10], ['douz-dune', 75], ['douz-night', 0]],
-    note: 'Google Maps marks the direct Chenini to Ksar Ghilane track as closed, so the plan goes south first (Chenini, Guermessa), then back north to Ghomrassen and west on the paved C114 past Ksar Hallouf. You still reach Douz around 16:20, in time for the quad at sunset.',
+    stops: [['tataouine-night', 0], ['chenini-tataouine', 60], ['guermessa', 30], ['ghomrassen', 20], ['ksar-hadada', 25], ['beni-khedache', 0], ['ksar-hallouf', 15], ['ksar-ghilane', 60], ['douz', 0], ['douz-hotel', 10], ['douz-dune', 75], ['douz-night', 0]],
+    note: 'Google Maps marks the direct Chenini to Ksar Ghilane track as closed, so the plan goes south first (Chenini, Guermessa), then back north to Ghomrassen. Ksar Hadada and Ksar Hallouf, moved from day 1, are on the way to the paved C114 west. To make room, Ksar Ghilane is cut to 1 hour. If the morning runs late, skip Ksar Hallouf, not Ksar Hadada.',
     night: 'n2',
   },
   {
@@ -443,7 +442,10 @@ export const rental = {
 export const googleLegs = {
   'sousse>agareb': [91, 135], 'agareb>chenini-gabes': [87, 145], 'chenini-gabes>jara': [13, 6.2], 'jara>matmata-new': [31, 27],
   'matmata-new>matmata': [20, 15.9], 'sidi-driss>toujane': [35, 26.2], 'toujane>dkhilet-toujane': [13, 9.1],
-  'dkhilet-toujane>ksar-hallouf': [31, 22.7], 'ksar-hallouf>beni-khedache': [14, 7.9], 'beni-khedache>ksar-hadada': [30, 24.7],
+  'dkhilet-toujane>ksar-hallouf': [31, 22.7], 'ksar-hallouf>beni-khedache': [14, 7.9], 'beni-khedache>ksar-hallouf': [14, 7.9],
+  // 7 Nov: OSRM is far too slow on the C114 (it gave 239 min for Ghomrassen → Ksar Ghilane against Google's 115).
+  // Estimate: Google's Ghomrassen → Ksar Ghilane leg minus the Ghomrassen → Beni Khedache part.
+  'ksar-hallouf>ksar-ghilane': [90, 95], 'ksar-hadada>beni-khedache': [30, 24.7], 'beni-khedache>ksar-hadada': [30, 24.7],
   'chenini-tataouine>guermessa': [26, 27], 'guermessa>ghomrassen': [15, 11.8],
   'ghomrassen>ksar-ghilane': [115, 122], 'ksar-ghilane>douz': [99, 143], 'douz>douz-hotel': [6, 3],
   'douz-hotel>chott': [85, 86], 'chott>tozeur-medina': [40, 43],
@@ -456,4 +458,8 @@ export const googleLegs = {
 export const viaPoints = {
   // north to Beni Khedache, then west on the C114 to the C211, then south to Ksar Ghilane
   'ghomrassen>ksar-ghilane': [[33.2514, 10.2001], [33.27, 9.7]],
+  // day 2 after the 7 Nov change: from Ksar Hallouf west on the C114
+  'ksar-hallouf>ksar-ghilane': [[33.27, 9.7]],
+  // day 1 after the 7 Nov change: Toujane down to Medenine, then the main road south
+  'toujane>tataouine-night': [[33.3549, 10.5055]],
 };
